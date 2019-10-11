@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Lara Maia <dev@lara.click> <DATE>
+# Lara Maia <dev@lara.click> 2019
 #
 # The RGBFanControl is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -34,7 +34,7 @@ class AboutWindow(Gtk.AboutDialog):
         self.set_website("http://github.com/ShyPixie/RGBFanControl")
         self.set_website_label("Git Repository")
         # self.set_version(__version__)
-        self.set_copyright("Lara Maia (C) <DATE> - dev@lara.click")
+        self.set_copyright("Lara Maia (C) 2019 - dev@lara.click")
         self.set_comments("Made with Love <3")
         self.set_license_type(Gtk.License.GPL_3_0)
 
