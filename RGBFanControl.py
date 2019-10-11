@@ -22,6 +22,7 @@ import serial
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
 
+import config
 import window
 import about
 
@@ -35,13 +36,6 @@ class RGBFanControl(Gtk.Application):
         self._serial.setDTR(False)
         self._serial.baudrate = 9600
         self._serial.port = 'COM9'
-
-        self.power_status = ['1', '1', '1']
-        self.leds_colors = ['255000000', '000255000', '000000255']
-        self.delay = ['000', '000', '000']
-        self.divisor = ['001', '001', '001']
-        self.multiplier = ['001', '001', '001']
-        self.effect = ['0', '0', '0']
 
     @property
     def main_window(self) -> Gtk.ApplicationWindow:
@@ -86,6 +80,8 @@ class RGBFanControl(Gtk.Application):
 
 
 if __name__ == '__main__':
+    config.init()
+
     application = RGBFanControl("click.lara.RGBFanControl", Gio.ApplicationFlags.FLAGS_NONE)
 
     # noinspection PyUnresolvedReferences

@@ -33,7 +33,7 @@ struct front_fans_settings
     byte pulse_sync = 0;
 
     unsigned int hue[fan_count] = {0, 0, 0};
-    unsigned int effect_id[fan_count] = {1, 1, 1};
+    unsigned int effect_id[fan_count] = {0, 0, 0};
 
     unsigned int p_delay[fan_count] = {6, 6, 6};
     unsigned int p_divisor[fan_count] = {4, 4, 4};
