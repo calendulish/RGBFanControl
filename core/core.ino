@@ -23,14 +23,16 @@
 #include "front.h"
 #include "back.h"
 
+unsigned long start_time = millis();
+
 void setup()
 {
-    Serial.begin(9600);
+    Serial.begin(2000000);
     Serial.setTimeout(10);
     Serial.println("");
     Serial.println("RGB Cooler Control V0.0.0 <dev@lara.click> 2019");
     Serial.println("Available functions:");
-    Serial.println("- f: [p][l][e][c][d][i][m]");
+    Serial.println("- f: [p][l][e][c][d][i][m][s]");
     Serial.println("- b: [e,c]");
     Serial.println("---> p: boolean <BB..>");
     Serial.println("---> l: boolean <BB..>");
@@ -39,14 +41,20 @@ void setup()
     Serial.println("---> d: integer <NNN..>");
     Serial.println("---> i: integer <NNN..>");
     Serial.println("---> m: integer <NNN..>");
+    Serial.println("---> s: integer <NNN..>");
 
     DDRD |= 0b11111100;
     DDRB |= 0b11111111;
-    DDRC |= 0b11111111;
+    DDRC |= 0b00000000;
 
     FastLED.addLeds<NEOPIXEL, back.data_pin>(back.leds, back.led_count);
 
-    for( unsigned int i = 0; i < back.led_count; i++)
+    for(unsigned int i = 0; i < front.fan_count; i++)
+    {
+        fast_write(front.fan_speed_register[i], front.fan_speed_pin[i], HIGH);
+    }
+
+    for(unsigned int i = 0; i < back.led_count; i++)
     {
         back.rgb[i][0] = 200;
         back.rgb[i][1] = 0;
@@ -64,8 +72,25 @@ void loop()
     update_fan_power(1);
     update_fan_power(2);
 
-    for( unsigned int i = 0; i < front.fan_count; i++)
+
+    if(millis() - start_time >= 2000)
     {
+        for(unsigned int i = 0; i < front.fan_count; i++)
+        {
+            front.fan_speed[i] = front.fan_speed_frequency[i] * 8;
+            front.fan_speed_frequency[i] = 0;
+        }
+
+        start_time = millis();
+    }
+
+    for(unsigned int i = 0; i < front.fan_count; i++)
+    {
+        if(fast_read(front.fan_speed_register[i], front.fan_speed_pin[i]) == 0)
+        {
+            front.fan_speed_frequency[i] += 1;
+        }
+
         switch(front.effect_id[i])
         {
             case 0:

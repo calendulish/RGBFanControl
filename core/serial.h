@@ -47,7 +47,7 @@ unsigned int next_int(String *string_, unsigned int count = 1)
 
 void front_functions(String *serial_string)
 {
-    if(serial_string->length() < 2)
+    if(serial_string->length() < 1)
     {
         Serial.println("[f] Wrong length");
         return;
@@ -93,7 +93,8 @@ void front_functions(String *serial_string)
                 front.effect_id[i] = effect_id;
                 break;
             case 'c':
-                for(unsigned int c = 0; c <= 2; c++)
+                unsigned int c;
+                for(c = 0; c <= 2; c++)
                 {
                     unsigned int color;
                     color = next_int(serial_string, 3);;
@@ -139,6 +140,9 @@ void front_functions(String *serial_string)
 
                 front.p_multiplier[i] = multiplier;
                 break;
+            case 's':
+                Serial.println(front.fan_speed[i]);
+                break;
             default:
                 Serial.println("[f] Wrong option");
                 return;
@@ -150,7 +154,7 @@ void front_functions(String *serial_string)
 
 void back_functions(String *serial_string)
 {
-    if(serial_string->length() < 2)
+    if(serial_string->length() < 1)
     {
         Serial.println("[b] Wrong length");
         return;
