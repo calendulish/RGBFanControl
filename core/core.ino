@@ -68,15 +68,11 @@ void loop()
 {
     fast_serial();
 
-    update_fan_power(0);
-    update_fan_power(1);
-    update_fan_power(2);
-
-
     if(millis() - start_time >= 2000)
     {
         for(unsigned int i = 0; i < front.fan_count; i++)
         {
+            update_front_fan_power(i);
             front.fan_speed[i] = front.fan_speed_frequency[i] * 8;
             front.fan_speed_frequency[i] = 0;
         }
@@ -86,6 +82,8 @@ void loop()
 
     for(unsigned int i = 0; i < front.fan_count; i++)
     {
+        update_back_fan_power(i);
+        
         if(fast_read(front.fan_speed_register[i], front.fan_speed_pin[i]) == 0)
         {
             front.fan_speed_frequency[i] += 1;

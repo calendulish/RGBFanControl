@@ -16,8 +16,34 @@
 */
 
 
+bool guess_back_fan_power()
+{
+    for(unsigned int i = 0; i < front.fan_count; i++)
+    {
+        if(front.fan_speed[i] != 0) {
+            return 1;
+        }
+    }
+    
+    return 0;
+}
+
+void update_back_fan_power(unsigned int fan)
+{
+    if(!guess_back_fan_power())
+    {
+        fill_solid(back.leds, back.led_count, CRGB::Black);
+        FastLED.show();
+    }
+}
+
 void neopixel_update_colors(unsigned int led)
 {
+    if(!guess_back_fan_power())
+    {
+        return;
+    }
+    
     back.leds[led].r = back.rgb[led][0];
     back.leds[led].g = back.rgb[led][1];
     back.leds[led].b = back.rgb[led][2];

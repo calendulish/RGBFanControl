@@ -32,7 +32,7 @@ void pulse( unsigned int fan,  unsigned int color) {
 }
 
 
-void update_fan_power( unsigned int fan, short force_value = -1)
+void update_front_fan_power( unsigned int fan, short force_value = -1)
 {
     if(force_value == -1)
     {
