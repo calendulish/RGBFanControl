@@ -22,7 +22,7 @@ import config
 
 
 def _led_color_to_rgba(led_color: str) -> Gdk.RGBA:
-    return Gdk.RGBA(*[int(led_color[c * 3:3 + c * 3]) for c in range(int(len(led_color) / 3))])
+    return Gdk.RGBA(*[int(led_color[c * 3:3 + c * 3]) / 255.0 for c in range(int(len(led_color) / 3))])
 
 
 class BFanSettings(Gtk.Frame):
@@ -32,9 +32,9 @@ class BFanSettings(Gtk.Frame):
         self.fan_index = fan_index
 
         if fan_index == -1:
-            self.set_label('Cooler Neo [ALL]')
+            self.set_label('Neo All')
         else:
-            self.set_label(f'Cooler Neo [{fan_index + 1}]')
+            self.set_label(f'Fan Neo [{fan_index + 1}]')
 
         self.set_label_align(0.02, 0.5)
 
@@ -43,18 +43,15 @@ class BFanSettings(Gtk.Frame):
         self._grid.set_row_spacing(5)
         self.add(self._grid)
 
-        self.color = Gtk.ColorSelection()
-        self.color.connect('color_changed', self.on_led_color_changed)
-        self.color.set_current_rgba(_led_color_to_rgba(config.get_from_index('back', 'led_colors', fan_index, 9)))
+        self.select_color = Gtk.Button("Set Color Manually")
+        self.select_color.connect("clicked", self.on_select_color_clicked)
 
-        self._grid.attach(self.color, 1, 0, 1, 1)
+        self._grid.attach(self.select_color, 1, 0, 1, 1)
 
         self.effect = Gtk.RadioButton("Color Effect")
-        self.effect.connect('toggled', self.on_effect_changed, 0)
         self._grid.attach(self.effect, 0, 1, 1, 1)
 
         self.hue_color_cycle = Gtk.RadioButton("Hue Color Cycle", group=self.effect)
-        self.hue_color_cycle.connect('toggled', self.on_effect_changed, 1)
         self._grid.attach(self.hue_color_cycle, 0, 2, 1, 1)
 
         if config.parser.get("back", "effect") == '1':
@@ -63,6 +60,28 @@ class BFanSettings(Gtk.Frame):
         else:
             self.effect.props.active = True
             self.effect.set_active(True)
+
+        self.effect.connect('toggled', self.on_effect_changed, 0)
+        self.hue_color_cycle.connect('toggled', self.on_effect_changed, 1)
+
+    def on_select_color_clicked(self, button: Gtk.Button) -> None:
+        color_dialog = Gtk.ColorSelectionDialog()
+        color_dialog.props.cancel_button.hide()
+
+        color_selection = color_dialog.get_color_selection()
+        rgba_color = _led_color_to_rgba(config.get_from_index('back', 'led_colors', self.fan_index, 9))
+        color_selection.set_current_rgba(rgba_color)
+        color_selection.connect('color_changed', self.on_led_color_changed)
+
+        color_dialog.connect("response", self.on_select_color_response)
+        color_dialog.run()
+
+    def on_select_color_response(self, dialog, response):
+        if response == Gtk.ResponseType.OK:
+            color_selection = dialog.get_color_selection()
+            self.on_led_color_changed(color_selection)
+
+        dialog.destroy()
 
     def on_led_color_changed(self, color_selection: Gtk.ColorSelection) -> None:
         serial_message = 'bc'
@@ -90,9 +109,9 @@ class FFanSettings(Gtk.Frame):
         self.fan_index = fan_index
 
         if fan_index == -1:
-            self.set_label('Cooler [ALL]')
+            self.set_label('ALL')
         else:
-            self.set_label(f'Cooler [{fan_index + 1}]')
+            self.set_label(f'Fan [{fan_index + 1}]')
 
         self.set_label_align(0.02, 0.5)
 
@@ -102,25 +121,21 @@ class FFanSettings(Gtk.Frame):
         self.add(self._grid)
 
         self.power = Gtk.ToggleButton('Power')
-        self.power.connect('clicked', self.on_power_clicked)
+        self._grid.attach(self.power, 0, 0, 1, 1)
 
         if config.get_from_index("front", "power_status", fan_index) == '1':
             self.power.set_active(True)
 
-        self._grid.attach(self.power, 0, 0, 1, 1)
+        self.power.connect('clicked', self.on_power_clicked)
 
-        self.color = Gtk.ColorSelection()
-        self.color.connect("color_changed", self.on_led_color_changed)
-        self.color.set_current_rgba(_led_color_to_rgba(config.get_from_index("front", "led_colors", fan_index, 9)))
-
-        self._grid.attach(self.color, 1, 0, 1, 1)
+        self.select_color = Gtk.Button("Set Color Manually")
+        self.select_color.connect("clicked", self.on_select_color_clicked)
+        self._grid.attach(self.select_color, 1, 0, 1, 1)
 
         self.effect = Gtk.RadioButton("Color Effect")
-        self.effect.connect('toggled', self.on_effect_changed, 0)
         self._grid.attach(self.effect, 0, 1, 1, 1)
 
         self.hue_color_cycle = Gtk.RadioButton("Hue Color Cycle", group=self.effect)
-        self.hue_color_cycle.connect('toggled', self.on_effect_changed, 1)
         self._grid.attach(self.hue_color_cycle, 0, 2, 1, 1)
 
         if config.get_from_index("front", "effect", self.fan_index) == '1':
@@ -130,19 +145,22 @@ class FFanSettings(Gtk.Frame):
             self.effect.props.active = True
             self.effect.set_active(True)
 
+        self.effect.connect('toggled', self.on_effect_changed, 0)
+        self.hue_color_cycle.connect('toggled', self.on_effect_changed, 1)
+
         self.delay = Gtk.Scale.new_with_range(Gtk.Orientation.VERTICAL, 0, 200, 1)
-        self.delay.connect('change-value', self.on_delay_change)
         self.delay.set_value(int(config.get_from_index("front", "delay", fan_index, 3)))
+        self.delay.connect('change-value', self.on_delay_change)
         self._grid.attach(self.delay, 2, 0, 1, 3)
 
         self.divisor = Gtk.Scale.new_with_range(Gtk.Orientation.VERTICAL, 1, 100, 1)
-        self.divisor.connect('change-value', self.on_divisor_change)
         self.divisor.set_value(int(config.get_from_index("front", "divisor", fan_index, 3)))
+        self.divisor.connect('change-value', self.on_divisor_change)
         self._grid.attach(self.divisor, 3, 0, 1, 3)
 
         self.multiplier = Gtk.Scale.new_with_range(Gtk.Orientation.VERTICAL, 1, 100, 1)
-        self.multiplier.connect('change-value', self.on_multiplier_change)
         self.multiplier.set_value(int(config.get_from_index("front", "multiplier", fan_index, 3)))
+        self.multiplier.connect('change-value', self.on_multiplier_change)
         self._grid.attach(self.multiplier, 4, 0, 1, 3)
 
     def on_power_clicked(self, button: Gtk.Button) -> None:
@@ -157,6 +175,25 @@ class FFanSettings(Gtk.Frame):
         serial_message += config.parser.get("front", "power_status")
 
         self.application.send_serial(serial_message)
+
+    def on_select_color_clicked(self, button: Gtk.Button) -> None:
+        color_dialog = Gtk.ColorSelectionDialog()
+        color_dialog.props.cancel_button.hide()
+
+        color_selection = color_dialog.get_color_selection()
+        rgba_color = _led_color_to_rgba(config.get_from_index('back', 'led_colors', self.fan_index, 9))
+        color_selection.set_current_rgba(rgba_color)
+        color_selection.connect('color_changed', self.on_led_color_changed)
+
+        color_dialog.connect("response", self.on_select_color_response)
+        color_dialog.run()
+
+    def on_select_color_response(self, dialog, response):
+        if response == Gtk.ResponseType.OK:
+            color_selection = dialog.get_color_selection()
+            self.on_led_color_changed(color_selection)
+
+        dialog.destroy()
 
     def on_led_color_changed(self, color_selection: Gtk.ColorSelection) -> None:
         serial_message = 'fc'

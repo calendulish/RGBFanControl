@@ -48,7 +48,7 @@ class Main(Gtk.ApplicationWindow):
         header_bar.pack_end(menu_button)
 
         self.set_titlebar(header_bar)
-        self.set_default_size(650, 450)
+        #self.set_default_size(650, 450)
         self.set_resizable(False)
         self.set_position(Gtk.WindowPosition.CENTER)
         self.set_title(title)
@@ -66,16 +66,20 @@ class Main(Gtk.ApplicationWindow):
         fan_all = utils.FFanSettings(application, -1)
         fan_neo = utils.BFanSettings(application, 0)
 
-        main_grid.attach(fan1, 0, 0, 1, 1)
-        main_grid.attach(fan2, 1, 0, 1, 1)
-        main_grid.attach(fan3, 0, 1, 1, 1)
-        main_grid.attach(fan_all, 1, 1, 1, 1)
-        main_grid.attach(fan_neo, 0, 2, 1, 1)
+        notebook = Gtk.Notebook()
+        main_grid.attach(notebook, 0, 0, 1, 1)
 
-        reset = Gtk.Button("Reset")
+        notebook.append_page(fan1, Gtk.Label("Fan 1"))
+        notebook.append_page(fan2, Gtk.Label("Fan 2"))
+        notebook.append_page(fan3, Gtk.Label("Fan 3"))
+        notebook.append_page(fan_neo, Gtk.Label("Neo"))
+        notebook.append_page(fan_all, Gtk.Label("All"))
+
+        reset = Gtk.Button("Reset Arduino")
         reset.connect('clicked', self.on_reset_clicked)
-        main_grid.attach(reset, 0, 3, 2, 1)
+        main_grid.attach(reset, 0, 1, 1, 1)
 
+        self.connect("destroy", self.application.on_exit_activate, None)
         self.show_all()
 
     def on_reset_clicked(self, button: Gtk.Button) -> None:
