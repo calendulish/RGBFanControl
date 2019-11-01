@@ -63,13 +63,13 @@ class Main(Gtk.ApplicationWindow):
         fan1 = utils.FFanSettings(application, 0)
         fan2 = utils.FFanSettings(application, 1)
         fan3 = utils.FFanSettings(application, 2)
-        #fan_all = utils.FFanSettings(application, -1)
+        fan_all = utils.FFanSettings(application, -1)
         fan_neo = utils.BFanSettings(application, 0)
 
         main_grid.attach(fan1, 0, 0, 1, 1)
         main_grid.attach(fan2, 1, 0, 1, 1)
         main_grid.attach(fan3, 0, 1, 1, 1)
-        #main_grid.attach(fan_all, 1, 1, 1, 1)
+        main_grid.attach(fan_all, 1, 1, 1, 1)
         main_grid.attach(fan_neo, 0, 2, 1, 1)
 
         reset = Gtk.Button("Reset")

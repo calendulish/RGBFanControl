@@ -55,6 +55,9 @@ def new(section: str, option: str, value: Any) -> None:
 
 
 def get_from_index(section: str, option: str, index: int, size: int = 1) -> str:
+    if index == -1:
+        return '0'
+
     return parser.get(section, option)[size * index:size * index + size]
 
 
