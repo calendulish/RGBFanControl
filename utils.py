@@ -43,9 +43,9 @@ class BFanSettings(Gtk.Frame):
         self._grid.set_row_spacing(5)
         self.add(self._grid)
 
-        self.color = Gtk.ColorButton()
-        self.color.connect('notify::color', self.on_led_color_activated)
-        self.color.set_rgba(_led_color_to_rgba(config.get_from_index('back', 'led_colors', fan_index, 9)))
+        self.color = Gtk.ColorSelection()
+        self.color.connect('color_changed', self.on_led_color_changed)
+        self.color.set_current_rgba(_led_color_to_rgba(config.get_from_index('back', 'led_colors', fan_index, 9)))
 
         self._grid.attach(self.color, 1, 0, 1, 1)
 
@@ -64,9 +64,9 @@ class BFanSettings(Gtk.Frame):
             self.effect.props.active = True
             self.effect.set_active(True)
 
-    def on_led_color_activated(self, color_button: Gtk.ColorButton, param: str) -> None:
+    def on_led_color_changed(self, color_selection: Gtk.ColorSelection) -> None:
         serial_message = 'bc'
-        color_raw = color_button.get_rgba().to_string()
+        color_raw = color_selection.get_current_rgba().to_string()
         color_string = ['{0:0=3d}'.format(int(color)) for color in color_raw[4:-1].split(',')]
         config.new("back", "led_colors", ''.join(color_string) * 29)
 
@@ -109,9 +109,9 @@ class FFanSettings(Gtk.Frame):
 
         self._grid.attach(self.power, 0, 0, 1, 1)
 
-        self.color = Gtk.ColorButton()
-        self.color.connect('notify::color', self.on_led_color_activated)
-        self.color.set_rgba(_led_color_to_rgba(config.get_from_index("front", "led_colors", fan_index, 9)))
+        self.color = Gtk.ColorSelection()
+        self.color.connect("color_changed", self.on_led_color_changed)
+        self.color.set_current_rgba(_led_color_to_rgba(config.get_from_index("front", "led_colors", fan_index, 9)))
 
         self._grid.attach(self.color, 1, 0, 1, 1)
 
@@ -158,9 +158,10 @@ class FFanSettings(Gtk.Frame):
 
         self.application.send_serial(serial_message)
 
-    def on_led_color_activated(self, color_button: Gtk.ColorButton, param: str) -> None:
+    def on_led_color_changed(self, color_selection: Gtk.ColorSelection) -> None:
         serial_message = 'fc'
-        color_string = ['{0:0=3d}'.format(int(color)) for color in color_button.get_rgba().to_string()[4:-1].split(',')]
+        raw_color = color_selection.get_current_rgba().to_string()
+        color_string = ['{0:0=3d}'.format(int(color)) for color in raw_color[4:-1].split(',')]
 
         if self.fan_index == -1:
             config.new("front", "led_colors", ''.join(color_string) * 3)
