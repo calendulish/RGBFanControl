@@ -226,6 +226,18 @@ void fast_serial()
             case 'b':
                 back_functions(&serial_string);
                 break;
+            case 's':
+                save();
+                break;
+            case 'l':
+                load();
+                break;
+            case 'd':
+                update_eeprom_status(0);
+                break;
+            case 'e':
+                update_eeprom_status(1);
+                break;
             default:
                 Serial.println("[:] Wrong option");
                 break;

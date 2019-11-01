@@ -15,6 +15,8 @@
     along with this program. If not, see http://www.gnu.org/licenses/.
 */
 
+#include <EEPROM.h>
+
 byte fast_read(char register_, byte pin)
 {
     switch(register_)
@@ -89,4 +91,26 @@ byte* hue_to_rgb(unsigned int hue)
     }
 
     return rgb;
+}
+
+void save() {
+    EEPROM.put(0, front);
+    EEPROM.put(sizeof(front), back);
+}
+
+void load() {
+    EEPROM.get(0, front);
+    EEPROM.get(sizeof(front), back);
+}
+
+byte get_eeprom_status() {
+    byte EEPROM_status;
+    
+    EEPROM.get(sizeof(front)+sizeof(back), EEPROM_status);
+
+    return EEPROM_status;
+}
+
+void update_eeprom_status(byte EEPROM_status) {
+    EEPROM.put(sizeof(front)+sizeof(back), EEPROM_status);
 }

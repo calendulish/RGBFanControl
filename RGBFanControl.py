@@ -42,6 +42,7 @@ class RGBFanControl(Gtk.Application):
         return self.get_window_by_id(self._main_window_id)
 
     def do_activate(self) -> None:
+        self.send_serial('de')
         main_window = window.Main(application=self, title="RGBFanControl")
         self._main_window_id = main_window.get_id()
         main_window.show()
@@ -76,6 +77,8 @@ class RGBFanControl(Gtk.Application):
         about_dialog.show()
 
     def on_exit_activate(self, action: Gio.Action, data: str) -> None:
+        self.send_serial('se')
+        self.send_serial('ee')
         self.quit()
 
 

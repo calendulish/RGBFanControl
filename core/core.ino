@@ -34,6 +34,10 @@ void setup()
     Serial.println("Available functions:");
     Serial.println("- f: [p][l][e][c][d][i][m][s]");
     Serial.println("- b: [e,c]");
+    Serial.println("- se: [-]");
+    Serial.println("- le: [-]");
+    Serial.println("- ee: [-]");
+    Serial.println("- de: [-]");
     Serial.println("---> p: boolean <BB..>");
     Serial.println("---> l: boolean <BB..>");
     Serial.println("---> e: boolean <BB..>");
@@ -62,14 +66,21 @@ void setup()
 
         back.effect_id[i] = 0;
     }
+
+    update_eeprom_status(1);
 }
 
 void loop()
 {
     fast_serial();
 
-    if(millis() - start_time >= 2000)
+    if(millis() - start_time >= 5000)
     {
+        if(get_eeprom_status() == 1)
+        {
+            load();
+        }
+        
         for(unsigned int i = 0; i < front.fan_count; i++)
         {
             update_front_fan_power(i);
