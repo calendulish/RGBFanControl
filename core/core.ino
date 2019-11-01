@@ -60,7 +60,7 @@ void setup()
 
     for(unsigned int i = 0; i < back.led_count; i++)
     {
-        back.rgb[i][0] = 200;
+        back.rgb[i][0] = 0;
         back.rgb[i][1] = 0;
         back.rgb[i][2] = 0;
 

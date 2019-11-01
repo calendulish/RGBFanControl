@@ -30,7 +30,7 @@ struct front_fans_settings
     const char rgb_register[fan_count] = {'B', 'B', 'B'};
 
     byte fan_power[fan_count] = {1, 1, 1};
-    byte led_power[fan_count] = {1, 1, 1};
+    byte led_power[fan_count] = {0, 0, 0};
     byte rgb[fan_count][3] = {{255, 0, 0}, {255, 0, 0}, {255, 0, 0}};
     byte pulse_sync = 0;
 

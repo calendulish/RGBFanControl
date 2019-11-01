@@ -28,7 +28,7 @@ def init() -> None:
     parser.read_dict(
         {
             'front': {
-                'power_status': '111',
+                'power_status': '000',
                 'led_colors': '255000000' * 3,
                 'delay': '000' * 3,
                 'divisor': '001' * 3,
@@ -36,7 +36,7 @@ def init() -> None:
                 'effect': '000',
             },
             'back': {
-                'led_colors': '255000000' * 29,
+                'led_colors': '000000000' * 29,
                 'effect': '0',
             },
         }
