@@ -27,7 +27,7 @@ unsigned long start_time = millis();
 
 void setup()
 {
-    Serial.begin(2000000);
+    Serial.begin(19200);
     Serial.setTimeout(10);
     Serial.println("");
     Serial.println("RGB Cooler Control V0.0.0 <dev@lara.click> 2019");
