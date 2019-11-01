@@ -21,7 +21,7 @@ import os
 from typing import Any
 
 parser = configparser.RawConfigParser()
-config_file = 'config.ini'
+config_file = os.path.join(os.getcwd(), 'config.ini')
 
 
 def init() -> None:
