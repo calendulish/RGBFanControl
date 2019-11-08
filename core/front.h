@@ -44,15 +44,18 @@ void update_front_fan_power( unsigned int fan, short force_value = -1)
     }
 }
 
-void update_led_power( unsigned int fan, short force_value = -1)
+void update_led_power( unsigned int fan)
 {
-    if(force_value == -1)
+    for(unsigned int i = 0; i < front.fan_count; i++)
     {
-        fast_write(front.led_power_register[fan], front.led_power_pin[fan], front.led_power[fan]);
-    }
-    else
-    {
-        fast_write(front.led_power_register[fan], front.led_power_pin[fan], 0);
+        if(i == fan)
+        {
+            fast_write(front.led_power_register[fan], front.led_power_pin[fan], front.led_power[fan]);
+        }
+        else
+        {
+            fast_write(front.led_power_register[i], front.led_power_pin[i], 0);
+        }
     }
 }
 
@@ -62,7 +65,6 @@ void update_colors( unsigned int fan)
     pulse(fan, 0);
     pulse(fan, 1);
     pulse(fan, 2);
-    update_led_power(fan, 0);
 }
 
 void pulse_color_cycle( unsigned int fan)
