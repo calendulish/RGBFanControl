@@ -70,63 +70,77 @@ void setup()
     update_eeprom_status(1);
 }
 
+void lazy_loop()
+{
+    if(get_eeprom_status() == 1)
+    {
+        load();
+    }
+
+    for(unsigned int i = 0; i < front.fan_count; i++)
+    {
+        update_front_fan_power(i);
+        front.fan_speed[i] = front.fan_speed_frequency[i] * 8;
+        front.fan_speed_frequency[i] = 0;
+    }
+
+    for(unsigned int i = 0; i < back.fan_count; i++)
+    {
+        update_back_fan_power(i);
+    }
+}
+
+void front_loop(unsigned int current)
+{
+    if(fast_read(front.fan_speed_register[current], front.fan_speed_pin[current]) == 0)
+    {
+        front.fan_speed_frequency[current] += 1;
+    }
+
+    switch(front.effect_id[current])
+    {
+        case 0:
+            update_colors(current);
+            break;
+        case 1:
+            pulse_color_cycle(current);
+            break;
+    }
+}
+
+void back_loop(unsigned int current, unsigned int led)
+{
+    switch(back.effect_id[current])
+    {
+        case 0:
+            neopixel_update_colors(led);
+            break;
+        case 1:
+            neopixel_color_cycle(led);
+            break;
+    }
+}
+
 void loop()
 {
     fast_serial();
 
     if(millis() - start_time >= 5000)
     {
-        if(get_eeprom_status() == 1)
-        {
-            load();
-        }
-        
-        for(unsigned int i = 0; i < front.fan_count; i++)
-        {
-            update_front_fan_power(i);
-            front.fan_speed[i] = front.fan_speed_frequency[i] * 8;
-            front.fan_speed_frequency[i] = 0;
-        }
-
-        for(unsigned int i = 0; i < back.fan_count; i++)
-        {
-            update_back_fan_power(i);
-        }
-
+        lazy_loop();
         start_time = millis();
     }
 
     for(unsigned int i = 0; i < front.fan_count; i++)
     {
-        if(fast_read(front.fan_speed_register[i], front.fan_speed_pin[i]) == 0)
-        {
-            front.fan_speed_frequency[i] += 1;
-        }
-
-        switch(front.effect_id[i])
-        {
-            case 0:
-                update_colors(i);
-                break;
-            case 1:
-                pulse_color_cycle(i);
-                break;
-        }
+        front_loop(i);
     }
 
     for( unsigned int i = 0; i < back.fan_count; i++)
     {
         for(unsigned int l = 0; l < back.led_count; l++)
         {
-            switch(back.effect_id[i])
-            {
-                case 0:
-                    neopixel_update_colors(l);
-                    break;
-                case 1:
-                    neopixel_color_cycle(l);
-                    break;
-            }
+            back_loop(i, l);
         }
         FastLED.show();
     }
