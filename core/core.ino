@@ -88,13 +88,16 @@ void loop()
             front.fan_speed_frequency[i] = 0;
         }
 
+        for(unsigned int i = 0; i < back.fan_count; i++)
+        {
+            update_back_fan_power(i);
+        }
+
         start_time = millis();
     }
 
     for(unsigned int i = 0; i < front.fan_count; i++)
     {
-        update_back_fan_power(i);
-        
         if(fast_read(front.fan_speed_register[i], front.fan_speed_pin[i]) == 0)
         {
             front.fan_speed_frequency[i] += 1;
