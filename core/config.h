@@ -32,7 +32,7 @@ struct front_fans_settings
     byte fan_power[fan_count] = {1, 1, 1};
     byte led_power[fan_count] = {0, 0, 0};
     byte rgb[fan_count][3] = {{255, 0, 0}, {255, 0, 0}, {255, 0, 0}};
-    byte pulse_sync = 0;
+    byte pulse_sync = 1;
 
     unsigned int hue[fan_count] = {0, 0, 0};
     unsigned int effect_id[fan_count] = {0, 0, 0};

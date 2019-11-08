@@ -27,7 +27,9 @@ void pulse( unsigned int fan,  unsigned int color) {
 
     if(front.pulse_sync == 1)
     {
-        delayMicroseconds(front.p_delay[fan] * 255 - hue);
+        PORTB |= (1 << front.rgb_pin[color]);
+        delayMicroseconds(front.p_delay[fan] * 255 - front.rgb[fan][color]);
+        PORTB &= ~(1 << front.rgb_pin[color]);
     }
 }
 
