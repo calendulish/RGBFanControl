@@ -141,7 +141,14 @@ void front_functions(String *serial_string)
                 front.p_multiplier[i] = multiplier;
                 break;
             case 's':
-                Serial.println(front.fan_speed[i]);
+                if(get_eeprom_status() == 1)
+                {
+                    Serial.println("EEPROM enabled");
+                }
+                else
+                {
+                    Serial.println(front.fan_speed[i]);
+                }
                 break;
             default:
                 Serial.println("[f] Wrong option");

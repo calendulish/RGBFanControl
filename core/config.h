@@ -19,8 +19,8 @@ struct front_fans_settings
 {
     static const unsigned int fan_count = 3;
 
-    const byte fan_power_pin[fan_count] = {PORTD7, PORTD6, PORTD4};
-    const byte fan_speed_pin[fan_count] = {PORTC0, PORTC1, PORTC2};
+    const byte fan_power_pin[fan_count] = {PORTD7, PORTD4, PORTD6};
+    const byte fan_speed_pin[fan_count] = {PORTC0, PORTC2, PORTC1};
     const byte led_power_pin[fan_count] = {PORTB4, PORTD3, PORTD5};
     const byte rgb_pin[fan_count] = {PORTB2, PORTB3, PORTB1};
 
