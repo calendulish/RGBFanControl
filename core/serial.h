@@ -55,7 +55,7 @@ void front_functions(String *serial_string)
 
     char function = next_char(serial_string);
 
-    for(unsigned int i = 0; i < front.fan_count; i++)
+    for(unsigned int i = 0; i < front_params.fan_count; i++)
     {
         switch(function)
         {
@@ -68,7 +68,7 @@ void front_functions(String *serial_string)
                     return;
                 }
 
-                front.fan_power[i] = fan_power;
+                front_settings.fan_power[i] = fan_power;
                 break;
             case 'l':
                 unsigned int led_power;
@@ -79,7 +79,7 @@ void front_functions(String *serial_string)
                     return;
                 }
 
-                front.led_power[i] = led_power;
+                front_settings.led_power[i] = led_power;
                 break;
             case 'e':
                 unsigned int effect_id;
@@ -90,7 +90,7 @@ void front_functions(String *serial_string)
                     return;
                 }
 
-                front.effect_id[i] = effect_id;
+                front_settings.effect_id[i] = effect_id;
                 break;
             case 'c':
                 unsigned int c;
@@ -104,7 +104,7 @@ void front_functions(String *serial_string)
                         return;
                     }
 
-                    front.rgb[i][c] = color;
+                    front_settings.rgb[i][c] = color;
                 }
                 break;
             case 'd':
@@ -116,7 +116,7 @@ void front_functions(String *serial_string)
                     return;
                 }
 
-                front.p_delay[i] = delay_;
+                front_settings.p_delay[i] = delay_;
                 break;
             case 'i':
                 unsigned int divisor;
@@ -127,7 +127,7 @@ void front_functions(String *serial_string)
                     return;
                 }
 
-                front.p_divisor[i] = divisor;
+                front_settings.p_divisor[i] = divisor;
                 break;
             case 'm':
                 unsigned int multiplier;
@@ -138,17 +138,10 @@ void front_functions(String *serial_string)
                     return;
                 }
 
-                front.p_multiplier[i] = multiplier;
+                front_settings.p_multiplier[i] = multiplier;
                 break;
             case 's':
-                if(get_eeprom_status() == 1)
-                {
-                    Serial.println("EEPROM enabled");
-                }
-                else
-                {
-                    Serial.println(front.fan_speed[i]);
-                }
+                Serial.println(front_params.fan_speed[i]);
                 break;
             default:
                 Serial.println("[f] Wrong option");
@@ -169,7 +162,7 @@ void back_functions(String *serial_string)
 
     char function = next_char(serial_string);
 
-    for(unsigned int i = 0; i < back.fan_count; i++)
+    for(unsigned int i = 0; i < back_params.fan_count; i++)
     {
         switch(function)
         {
@@ -182,12 +175,12 @@ void back_functions(String *serial_string)
                     return;
                 }
 
-                back.effect_id[i] = effect_id;
+                back_settings.effect_id[i] = effect_id;
                 break;
             case 'c':
                 unsigned int l;
                 
-                for(l = 0; l < back.led_count; l++)
+                for(l = 0; l < back_params.led_count; l++)
                 {
                     unsigned int c;
                     for(c = 0; c <= 2; c++)
@@ -200,7 +193,7 @@ void back_functions(String *serial_string)
                             return;
                         }
     
-                        back.rgb[l][c] = color;
+                        back_settings.rgb[l][c] = color;
                     }
                 }
                 break;

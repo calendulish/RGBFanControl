@@ -15,53 +15,53 @@
     along with this program. If not, see http://www.gnu.org/licenses/.
 */
 
-void pulse( unsigned int fan,  unsigned int color) {
-    unsigned int hue = (front.rgb[fan][color] * front.p_multiplier[fan]) / front.p_divisor[fan];
+void pulse(unsigned int fan, unsigned int color) {
+    unsigned int hue = (front_settings.rgb[fan][color] * front_settings.p_multiplier[fan]) / front_settings.p_divisor[fan];
 
-    for( unsigned int i = 0; i < hue; i++)
+    for(unsigned int i = 0; i < hue; i++)
     {
-        PORTB |= (1 << front.rgb_pin[color]);
-        delayMicroseconds(front.p_delay[fan]);
-        PORTB &= ~(1 << front.rgb_pin[color]);
+        PORTB |= (1 << front_params.rgb_pin[color]);
+        delayMicroseconds(front_settings.p_delay[fan]);
+        PORTB &= ~(1 << front_params.rgb_pin[color]);
     }
 
-    if(front.pulse_sync == 1)
+    if(front_settings.pulse_sync == 1)
     {
-        PORTB |= (1 << front.rgb_pin[color]);
-        delayMicroseconds(front.p_delay[fan] * 255 - front.rgb[fan][color]);
-        PORTB &= ~(1 << front.rgb_pin[color]);
+        PORTB |= (1 << front_params.rgb_pin[color]);
+        delayMicroseconds(front_settings.p_delay[fan] * 255 - front_settings.rgb[fan][color]);
+        PORTB &= ~(1 << front_params.rgb_pin[color]);
     }
 }
 
 
-void update_front_fan_power( unsigned int fan, short force_value = -1)
+void update_front_fan_power(unsigned int fan, short force_value = -1)
 {
     if(force_value == -1)
     {
-        fast_write(front.fan_power_register[fan], front.fan_power_pin[fan], front.fan_power[fan]);
+        fast_write(front_params.fan_power_register[fan], front_params.fan_power_pin[fan], front_settings.fan_power[fan]);
     }
     else
     {
-        fast_write(front.fan_power_register[fan], front.fan_power_pin[fan], 0);
+        fast_write(front_params.fan_power_register[fan], front_params.fan_power_pin[fan], 0);
     }
 }
 
-void update_led_power( unsigned int fan)
+void update_led_power(unsigned int fan)
 {
-    for(unsigned int i = 0; i < front.fan_count; i++)
+    for(unsigned int i = 0; i < front_params.fan_count; i++)
     {
         if(i == fan)
         {
-            fast_write(front.led_power_register[fan], front.led_power_pin[fan], front.led_power[fan]);
+            fast_write(front_params.led_power_register[fan], front_params.led_power_pin[fan], front_settings.led_power[fan]);
         }
         else
         {
-            fast_write(front.led_power_register[i], front.led_power_pin[i], 0);
+            fast_write(front_params.led_power_register[i], front_params.led_power_pin[i], 0);
         }
     }
 }
 
-void update_colors( unsigned int fan)
+void update_colors(unsigned int fan)
 {
     update_led_power(fan);
     pulse(fan, 0);
@@ -69,17 +69,17 @@ void update_colors( unsigned int fan)
     pulse(fan, 2);
 }
 
-void pulse_color_cycle( unsigned int fan)
+void pulse_color_cycle(unsigned int fan)
 {
-    if (front.hue[fan] <  255 * 6)
+    if (front_params.hue[fan] <  255 * 6)
     {
-        front.hue[fan] += 1;
+        front_params.hue[fan] += 1;
     }
     else
     {
-        front.hue[fan] = 0;
+        front_params.hue[fan] = 0;
     }
 
-    memcpy(front.rgb[fan], hue_to_rgb(front.hue[fan]), 3);
+    memcpy(front_settings.rgb[fan], hue_to_rgb(front_params.hue[fan]), 3);
     update_colors(fan);
 }

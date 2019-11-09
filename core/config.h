@@ -15,7 +15,7 @@
     along with this program. If not, see http://www.gnu.org/licenses/.
 */
 
-struct front_fans_settings
+struct front_fans_params
 {
     static const unsigned int fan_count = 3;
 
@@ -29,24 +29,27 @@ struct front_fans_settings
     const char led_power_register[fan_count] = {'B', 'D', 'D'};
     const char rgb_register[fan_count] = {'B', 'B', 'B'};
 
-    byte fan_power[fan_count] = {1, 1, 1};
-    byte led_power[fan_count] = {0, 0, 0};
-    byte rgb[fan_count][3] = {{255, 0, 0}, {255, 0, 0}, {255, 0, 0}};
-    byte pulse_sync = 1;
-
-    unsigned int hue[fan_count] = {0, 0, 0};
-    unsigned int effect_id[fan_count] = {0, 0, 0};
-
-    unsigned int p_delay[fan_count] = {6, 6, 6};
-    unsigned int p_divisor[fan_count] = {4, 4, 4};
-    unsigned int p_multiplier[fan_count] = {2, 2, 2};
-
     unsigned int fan_speed[fan_count] = {600, 600, 600};
     unsigned int fan_speed_frequency[fan_count] = {0, 0, 0};
+    unsigned int hue[fan_count] = {0, 0, 0};
 };
-struct front_fans_settings front;
+struct front_fans_params front_params;
 
-struct back_fans_settings
+struct front_fans_settings
+{
+    byte fan_power[front_params.fan_count] = {1, 1, 1};
+    byte led_power[front_params.fan_count] = {0, 0, 0};
+    byte rgb[front_params.fan_count][3] = {{255, 0, 0}, {255, 0, 0}, {255, 0, 0}};
+    byte pulse_sync = 1;
+    
+    unsigned int effect_id[front_params.fan_count] = {0, 0, 0};
+    unsigned int p_delay[front_params.fan_count] = {6, 6, 6};
+    unsigned int p_divisor[front_params.fan_count] = {4, 4, 4};
+    unsigned int p_multiplier[front_params.fan_count] = {2, 2, 2};
+};
+struct front_fans_settings front_settings;
+
+struct back_fans_params
 {
     static const unsigned int fan_count = 1;
     static const unsigned int led_count = 29;
@@ -54,14 +57,18 @@ struct back_fans_settings
 
     CRGB leds[led_count];
 
-    byte rgb[led_count][3];
+    unsigned int hue[led_count];
+};
+struct back_fans_params back_params;
+
+struct back_fans_settings
+{
+    byte rgb[back_params.led_count][3];
     byte pulse_sync = 1;
 
-    unsigned int hue[led_count];
-    unsigned int effect_id[fan_count];
-
+    unsigned int effect_id[back_params.fan_count];
     unsigned int p_delay = 1;
     unsigned int p_divisor = 1;
     unsigned int p_multiplier = 1;
 };
-struct back_fans_settings back;
+struct back_fans_settings back_settings;

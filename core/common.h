@@ -94,23 +94,23 @@ byte* hue_to_rgb(unsigned int hue)
 }
 
 void save() {
-    EEPROM.put(0, front);
-    EEPROM.put(sizeof(front), back);
+    EEPROM.put(0, front_settings);
+    EEPROM.put(sizeof(front_settings), back_settings);
 }
 
 void load() {
-    EEPROM.get(0, front);
-    EEPROM.get(sizeof(front), back);
+    EEPROM.get(0, front_settings);
+    EEPROM.get(sizeof(front_settings), back_settings);
 }
 
 byte get_eeprom_status() {
     byte EEPROM_status;
     
-    EEPROM.get(sizeof(front)+sizeof(back), EEPROM_status);
+    EEPROM.get(sizeof(front_settings)+sizeof(back_settings), EEPROM_status);
 
     return EEPROM_status;
 }
 
 void update_eeprom_status(byte EEPROM_status) {
-    EEPROM.put(sizeof(front)+sizeof(back), EEPROM_status);
+    EEPROM.put(sizeof(front_settings)+sizeof(back_settings), EEPROM_status);
 }

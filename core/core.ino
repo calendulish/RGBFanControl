@@ -51,20 +51,19 @@ void setup()
     DDRB |= 0b11111111;
     DDRC |= 0b00000000;
 
-    FastLED.addLeds<NEOPIXEL, back.data_pin>(back.leds, back.led_count);
+    FastLED.addLeds<NEOPIXEL, back_params.data_pin>(back_params.leds, back_params.led_count);
 
-    for(unsigned int i = 0; i < front.fan_count; i++)
+    for(unsigned int i = 0; i < front_params.fan_count; i++)
     {
-        fast_write(front.fan_speed_register[i], front.fan_speed_pin[i], HIGH);
+        fast_write(front_params.fan_speed_register[i], front_params.fan_speed_pin[i], HIGH);
     }
 
-    for(unsigned int i = 0; i < back.led_count; i++)
+    for(unsigned int i = 0; i < back_params.led_count; i++)
     {
-        back.rgb[i][0] = 0;
-        back.rgb[i][1] = 0;
-        back.rgb[i][2] = 0;
-
-        back.effect_id[i] = 0;
+        back_settings.rgb[i][0] = 0;
+        back_settings.rgb[i][1] = 0;
+        back_settings.rgb[i][2] = 0;
+        back_settings.effect_id[i] = 0;
     }
 
     update_eeprom_status(1);
@@ -77,14 +76,14 @@ void lazy_loop()
         load();
     }
 
-    for(unsigned int i = 0; i < front.fan_count; i++)
+    for(unsigned int i = 0; i < front_params.fan_count; i++)
     {
         update_front_fan_power(i);
-        front.fan_speed[i] = front.fan_speed_frequency[i] * 8;
-        front.fan_speed_frequency[i] = 0;
+        front_params.fan_speed[i] = front_params.fan_speed_frequency[i] * 8;
+        front_params.fan_speed_frequency[i] = 0;
     }
 
-    for(unsigned int i = 0; i < back.fan_count; i++)
+    for(unsigned int i = 0; i < back_params.fan_count; i++)
     {
         update_back_fan_power(i);
     }
@@ -92,12 +91,12 @@ void lazy_loop()
 
 void front_loop(unsigned int current)
 {
-    if(fast_read(front.fan_speed_register[current], front.fan_speed_pin[current]) == 0)
+    if(fast_read(front_params.fan_speed_register[current], front_params.fan_speed_pin[current]) == 0)
     {
-        front.fan_speed_frequency[current] += 1;
+        front_params.fan_speed_frequency[current] += 1;
     }
 
-    switch(front.effect_id[current])
+    switch(front_settings.effect_id[current])
     {
         case 0:
             update_colors(current);
@@ -110,7 +109,7 @@ void front_loop(unsigned int current)
 
 void back_loop(unsigned int current, unsigned int led)
 {
-    switch(back.effect_id[current])
+    switch(back_settings.effect_id[current])
     {
         case 0:
             neopixel_update_colors(led);
@@ -131,14 +130,14 @@ void loop()
         start_time = millis();
     }
 
-    for(unsigned int i = 0; i < front.fan_count; i++)
+    for(unsigned int i = 0; i < front_params.fan_count; i++)
     {
         front_loop(i);
     }
 
-    for( unsigned int i = 0; i < back.fan_count; i++)
+    for(unsigned int i = 0; i < back_params.fan_count; i++)
     {
-        for(unsigned int l = 0; l < back.led_count; l++)
+        for(unsigned int l = 0; l < back_params.led_count; l++)
         {
             back_loop(i, l);
         }
