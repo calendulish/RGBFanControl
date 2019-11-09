@@ -103,6 +103,12 @@ void load() {
     EEPROM.get(sizeof(front_settings), back_settings);
 }
 
+void clear() {
+    for(unsigned int i = 0; i < EEPROM.length(); i++) {
+        EEPROM.write(i, 0);
+    }
+}
+
 byte get_eeprom_status() {
     byte EEPROM_status;
     

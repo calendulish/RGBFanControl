@@ -38,6 +38,7 @@ void setup()
     Serial.println("- le: [-]");
     Serial.println("- ee: [-]");
     Serial.println("- de: [-]");
+    Serial.println("- ce: [-]");
     Serial.println("---> p: boolean <BB..>");
     Serial.println("---> l: boolean <BB..>");
     Serial.println("---> e: boolean <BB..>");

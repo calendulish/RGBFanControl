@@ -143,6 +143,17 @@ void front_functions(String *serial_string)
             case 's':
                 Serial.println(front_params.fan_speed[i]);
                 break;
+            case 'z':
+                unsigned int sync;
+                sync = next_int(serial_string);
+
+                if(sync == -1)
+                {
+                    return;
+                }
+
+                front_settings.pulse_sync = sync;
+                break;
             default:
                 Serial.println("[f] Wrong option");
                 return;
@@ -237,6 +248,9 @@ void fast_serial()
                 break;
             case 'e':
                 update_eeprom_status(1);
+                break;
+            case 'c':
+                clear();
                 break;
             default:
                 Serial.println("[:] Wrong option");
