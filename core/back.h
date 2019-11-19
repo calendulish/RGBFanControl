@@ -24,7 +24,7 @@ bool guess_back_fan_power()
             return 1;
         }
     }
-    
+
     return 0;
 }
 
@@ -43,10 +43,12 @@ void neopixel_update_colors(unsigned int led)
     {
         return;
     }
-    
-    back_params.leds[led].r = back_settings.rgb[led][0];
-    back_params.leds[led].g = back_settings.rgb[led][1];
-    back_params.leds[led].b = back_settings.rgb[led][2];
+
+    back_params.leds[led].setRGB(
+        back_settings.rgb[led][0],
+        back_settings.rgb[led][1],
+        back_settings.rgb[led][2]
+    );
 }
 
 void neopixel_color_cycle(unsigned int led)
