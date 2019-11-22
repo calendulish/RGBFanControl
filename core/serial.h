@@ -55,7 +55,7 @@ void front_functions(String *serial_string)
 
     char function = next_char(serial_string);
 
-    for(unsigned int i = 0; i < front_params.fan_count; i++)
+    for(unsigned int i = 0; i < UniLED->get_analog_led_count(); i++)
     {
         switch(function)
         {
@@ -140,9 +140,6 @@ void front_functions(String *serial_string)
 
                 front_settings.p_multiplier[i] = multiplier;
                 break;
-            case 's':
-                Serial.println(front_params.fan_speed[i]);
-                break;
             case 'z':
                 unsigned int sync;
                 sync = next_int(serial_string);
@@ -173,7 +170,7 @@ void back_functions(String *serial_string)
 
     char function = next_char(serial_string);
 
-    for(unsigned int i = 0; i < back_params.fan_count; i++)
+    for(unsigned int i = 0; i < UniLED->get_digital_led_count(); i++)
     {
         switch(function)
         {
@@ -189,23 +186,18 @@ void back_functions(String *serial_string)
                 back_settings.effect_id[i] = effect_id;
                 break;
             case 'c':
-                unsigned int l;
-                
-                for(l = 0; l < back_params.led_count; l++)
+                unsigned int c;
+                for(c = 0; c <= 2; c++)
                 {
-                    unsigned int c;
-                    for(c = 0; c <= 2; c++)
+                    unsigned int color;
+                    color = next_int(serial_string, 3);;
+
+                    if(color == -1)
                     {
-                        unsigned int color;
-                        color = next_int(serial_string, 3);;
-    
-                        if(color == -1)
-                        {
-                            return;
-                        }
-    
-                        back_settings.rgb[l][c] = color;
+                        return;
                     }
+
+                    back_settings.rgb[i][c] = color;
                 }
                 break;
             default:
