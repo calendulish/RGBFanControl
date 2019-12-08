@@ -85,27 +85,51 @@ void remove_endlines(String *string_)
     if (new_line_index != -1) string_->remove(new_line_index, 1);
 }
 
-void led_functions(String *serial_string)
+void led_options(String *serial_string)
 {
-    remove_endlines(serial_string);
+    char option = next_char(serial_string);
 
-    if (serial_string->length() < 1)
-    {
-        Serial.println("[l] Wrong length");
-        return;
-    }
-
-    char function = next_char(serial_string);
-
-    switch (function)
+    switch (option)
     {
         case 'e':
             update_setting(serial_string, config.effect_id, ARRAY_SIZE(config.effect_id), 3);
-            Serial.println("[le] Done!");
+            Serial.println("[le] Effect changed!");
             break;
         default:
             Serial.println("[l] Wrong option");
             return;
+    }
+}
+
+void memory_options(String *serial_string)
+{
+    char option = next_char(serial_string);
+
+    switch (option)
+    {
+        case 's':
+            memory_save();
+            Serial.println("[ms] Saved!");
+            break;
+        case 'l':
+            memory_load();
+            Serial.println("[ml] Loaded!");
+            break;
+        case 'c':
+            memory_clear();
+            Serial.println("[mc] Memory cleared!");
+            break;
+        case 'e':
+            set_memory_status(1);
+            Serial.println("[me] Memory enabled!");
+            break;
+        case 'd':
+            set_memory_status(0);
+            Serial.println("[md] Memory disabled!");
+            break;
+        default:
+            Serial.println("[m] Wrong option");
+            break;
     }
 }
 
@@ -114,7 +138,9 @@ void fast_serial()
     if (Serial.available())
     {
         String serial_string = Serial.readString();
+        remove_endlines(&serial_string);
 
+        // sub option must be present
         if (serial_string.length() < 2)
         {
             Serial.println("[:] Wrong length");
@@ -124,10 +150,10 @@ void fast_serial()
         switch (next_char(&serial_string))
         {
             case 'l':
-                led_functions(&serial_string);
+                led_options(&serial_string);
                 break;
-            case 'e':
-                //eeprom_functions(&serial_string);
+            case 'm':
+                memory_options(&serial_string);
                 break;
             default:
                 Serial.println("[:] Wrong option");

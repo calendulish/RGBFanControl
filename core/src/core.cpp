@@ -19,6 +19,7 @@
 #include <FastLED.h>
 #include "common.h"
 #include "config.h"
+#include "memory.h"
 #include "serial.h"
 
 void setup()
@@ -26,9 +27,10 @@ void setup()
     Serial.begin(19200);
     Serial.setTimeout(10);
     Serial.println("");
-    Serial.println("RGB Cooler Control V3.0.0 <dev@lara.click> 2019");
+    Serial.println("RGB Cooler Control V3.0.0 <dev@lara.click> 2020");
     Serial.println("Functions:");
     Serial.println(" - led[effect] <l[e]>");
+    Serial.println(" - memory[save, load, clear, enable, disable] <m[s, l, c, e, d]>");
     Serial.println("");
 
     DDRD |= 0b11111100;
@@ -42,7 +44,7 @@ void setup()
         fast_write(front_params.fan_speed_register[i], front_params.fan_speed_pin[i], HIGH);
     }*/
 
-    //update_eeprom_status(1);
+    set_memory_status(1);
 }
 
 
@@ -53,6 +55,12 @@ void loop()
     uint8_t wave;
     CRGB wave_rgb;
     FastLED.setBrightness(255);
+
+    EVERY_N_SECONDS(5)
+    {
+        if(memory_status() == 1)
+            memory_load();
+    }
 
     for (auto effect_id : config.effect_id)
     {
