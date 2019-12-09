@@ -15,8 +15,6 @@
  along with this program. If not, see http://www.gnu.org/licenses/.
 */
 
-#define ARRAY_SIZE(x) sizeof(x)/sizeof(x[0])
-
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "hicpp-signed-bitwise"
 

@@ -18,7 +18,7 @@
 #include <Arduino.h>
 #include <FastLED.h>
 #include "config.h"
-#include "common.h"
+#include "analog.h"
 #include "memory.h"
 #include "serial.h"
 
