@@ -21,6 +21,7 @@
 #include "analog.h"
 #include "memory.h"
 #include "serial.h"
+#include "cooler.h"
 
 void setup()
 {
@@ -31,18 +32,14 @@ void setup()
     Serial.println("Functions:");
     Serial.println(" - led[effect] <l[e]>");
     Serial.println(" - memory[save, load, clear, enable, disable] <m[s, l, c, e, d]>");
+    Serial.println(" - cooler[speed, power] <c[s, p]>");
     Serial.println("");
 
-    DDRD |= 0b11111100;
-    DDRB |= 0b11111111;
-    DDRC |= 0b00000000;
+    //DDRD |= 0b11111100;
+    //DDRB |= 0b11111111;
+    //DDRC |= 0b00000000;
 
     CFastLED::addLeds<NEOPIXEL, DIGITAL_DATA_PIN>(DIGITAL_LEDS, DIGITAL_LED_COUNT);
-
-    /*for (unsigned int i = 0; i < front_params.fan_count; i++)
-    {
-        fast_write(front_params.fan_speed_register[i], front_params.fan_speed_pin[i], HIGH);
-    }*/
 
     for (uint8_t pin = 0; pin < ANALOG_LED_COUNT; pin++)
     {
@@ -56,6 +53,20 @@ void setup()
         pinMode(ANALOG_RGB_PIN[pin], OUTPUT);
         ANALOG_RGB_MASK[pin] = digitalPinToBitMask(ANALOG_RGB_PIN[pin]);
         ANALOG_RGB_PORT[pin] = portOutputRegister(digitalPinToPort(ANALOG_RGB_PIN[pin]));
+    }
+
+    for (uint8_t pin = 0; pin < FAN_COUNT; pin++)
+    {
+        pinMode(FAN_PIN[pin], OUTPUT);
+        FAN_MASK[pin] = digitalPinToBitMask(FAN_PIN[pin]);
+        FAN_PORT[pin] = portOutputRegister(digitalPinToPort(FAN_PIN[pin]));
+        fan_lo(pin);
+
+        pinMode(FAN_SPEED_PIN[pin], INPUT);
+        FAN_SPEED_MASK[pin] = digitalPinToBitMask(FAN_SPEED_PIN[pin]);
+        FAN_SPEED_PORT[pin] = portOutputRegister(digitalPinToPort(FAN_SPEED_PIN[pin]));
+        FAN_SPEED_IN[pin] = portInputRegister(digitalPinToPort(FAN_SPEED_PIN[pin]));
+        fan_speed_hi(pin);
     }
 
     set_memory_status(1);
@@ -74,6 +85,23 @@ void loop()
     {
         if (memory_status() == 1)
             memory_load();
+
+        for (uint8_t fan = 0; fan < FAN_COUNT; fan++)
+        {
+            if (config.fan_power[fan] == 1)
+                fan_hi(fan);
+            else
+                fan_lo(fan);
+
+            FAN_SPEED[fan] = FAN_SPEED_FREQUENCY[fan] * 8;
+            FAN_SPEED_FREQUENCY[fan] = 0;
+        }
+    }
+
+    for (uint8_t fan = 0; fan < FAN_COUNT; fan++)
+    {
+        if (fan_speed_read(fan) == 0)
+            FAN_SPEED_FREQUENCY[fan] += 1;
     }
 
     for (auto effect_id : config.effect_id)

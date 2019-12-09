@@ -15,6 +15,8 @@
  along with this program. If not, see http://www.gnu.org/licenses/.
 */
 
+#define ARRAY_LEN(x) sizeof(x)/sizeof(x[0])
+
 char next_char(String *string_)
 {
     String substring_value = string_->substring(0, 1);
@@ -92,7 +94,7 @@ void led_options(String *serial_string)
     switch (option)
     {
         case 'e':
-            update_setting(serial_string, config.effect_id, ARRAY_SIZE(config.effect_id), 3);
+            update_setting(serial_string, config.effect_id, ARRAY_LEN(config.effect_id), 3);
             Serial.println("[le] Effect changed!");
             break;
         default:
@@ -133,6 +135,33 @@ void memory_options(String *serial_string)
     }
 }
 
+void cooler_options(String *serial_string)
+{
+    char option = next_char(serial_string);
+
+    switch (option)
+    {
+        case 's':
+            uint8_t fan;
+            for (fan = 0; fan < FAN_COUNT; fan++)
+            {
+                Serial.print("Fan ");
+                Serial.print(fan + 1);
+                Serial.print(": ");
+                Serial.println(FAN_SPEED[fan]);
+                Serial.println();
+            }
+            break;
+        case 'p':
+            update_setting(serial_string, config.fan_power, ARRAY_LEN(config.fan_power), 1, nullptr);
+            Serial.println("[c] Cooler power changed!");
+            break;
+        default:
+            Serial.println("[c] Wrong option");
+            break;
+    }
+}
+
 void fast_serial()
 {
     if (Serial.available())
@@ -154,6 +183,9 @@ void fast_serial()
                 break;
             case 'm':
                 memory_options(&serial_string);
+                break;
+            case 'c':
+                cooler_options(&serial_string);
                 break;
             default:
                 Serial.println("[:] Wrong option");

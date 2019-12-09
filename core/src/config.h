@@ -28,8 +28,20 @@ RwReg ANALOG_RGB_MASK[3];
 volatile RwReg *ANALOG_RGB_PORT[3];
 CRGB ANALOG_LEDS[ANALOG_LED_COUNT] = {};
 
+static const uint8_t FAN_COUNT = 3;
+static const uint8_t FAN_PIN[FAN_COUNT] = {7, 4, 6};
+RwReg FAN_MASK[FAN_COUNT];
+volatile RwReg *FAN_PORT[FAN_COUNT];
+static const uint8_t FAN_SPEED_PIN[FAN_COUNT] = {A0, A2, A1};
+RwReg FAN_SPEED_MASK[FAN_COUNT];
+volatile RwReg *FAN_SPEED_PORT[FAN_COUNT];
+volatile RwReg *FAN_SPEED_IN[FAN_COUNT];
+int FAN_SPEED_FREQUENCY[FAN_COUNT];
+int FAN_SPEED[FAN_COUNT];
+
 struct config_t
 {
     int effect_id[3];
-    uint8_t color[3];
+    int color[3];
+    int fan_power[FAN_COUNT];
 } config = {1, 0, 0, 255, 0, 0};
