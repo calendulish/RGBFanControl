@@ -17,8 +17,8 @@
 
 #include <Arduino.h>
 #include <FastLED.h>
-#include "common.h"
 #include "config.h"
+#include "common.h"
 #include "memory.h"
 #include "serial.h"
 
@@ -44,6 +44,20 @@ void setup()
         fast_write(front_params.fan_speed_register[i], front_params.fan_speed_pin[i], HIGH);
     }*/
 
+    for (uint8_t pin = 0; pin < ANALOG_LED_COUNT; pin++)
+    {
+        pinMode(ANALOG_LED_PIN[pin], OUTPUT);
+        ANALOG_LED_MASK[pin] = digitalPinToBitMask(ANALOG_LED_PIN[pin]);
+        ANALOG_LED_PORT[pin] = portOutputRegister(digitalPinToPort(ANALOG_LED_PIN[pin]));
+    }
+
+    for (uint8_t pin = 0; pin < 3; pin++)
+    {
+        pinMode(ANALOG_RGB_PIN[pin], OUTPUT);
+        ANALOG_RGB_MASK[pin] = digitalPinToBitMask(ANALOG_RGB_PIN[pin]);
+        ANALOG_RGB_PORT[pin] = portOutputRegister(digitalPinToPort(ANALOG_RGB_PIN[pin]));
+    }
+
     set_memory_status(1);
 }
 
@@ -58,7 +72,7 @@ void loop()
 
     EVERY_N_SECONDS(5)
     {
-        if(memory_status() == 1)
+        if (memory_status() == 1)
             memory_load();
     }
 
@@ -73,50 +87,65 @@ void loop()
             EVERY_N_MILLISECONDS(400)
                 {
                     fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, CRGB::Black);
+                    fill_solid(ANALOG_LEDS, ANALOG_LED_COUNT, CRGB::Black);
                     FastLED.show();
+                    analog_show();
                     FastLED.delay(200);
                 }
                 break;
             case 50: // solid color
                 fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, CRGB::Red);
+                fill_solid(ANALOG_LEDS, ANALOG_LED_COUNT, CRGB::Red);
                 break;
             case 100: // two colors
                 fill_gradient_RGB(DIGITAL_LEDS, DIGITAL_LED_COUNT, CRGB::Red, CRGB::Blue);
+                fill_gradient_RGB(ANALOG_LEDS, ANALOG_LED_COUNT, CRGB::Red, CRGB::Blue);
                 break;
             case 101: // two colors gradient
                 wave_rgb = blend(CRGB::Red, CRGB::Blue, beatsin8(10));
                 fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, wave_rgb);
+                fill_solid(ANALOG_LEDS, ANALOG_LED_COUNT, wave_rgb);
                 break;
             case 102: // two colors up-down
                 wave = beatsin8(20, 0, DIGITAL_LED_COUNT - 2);
                 fill_gradient_RGB(DIGITAL_LEDS + wave, DIGITAL_LED_COUNT - wave, CRGB::Red, CRGB::Blue);
+
+                wave = beatsin8(20, 0, ANALOG_LED_COUNT - 2);
+                fill_gradient_RGB(ANALOG_LEDS + wave, ANALOG_LED_COUNT - wave, CRGB::Red, CRGB::Blue);
                 break;
             case 200: // rainbow
                 fill_rainbow(DIGITAL_LEDS, DIGITAL_LED_COUNT, 0, 35);
+                fill_rainbow(ANALOG_LEDS, ANALOG_LED_COUNT, 0, 35);
                 break;
             case 201: // rotating rainbow
-                fill_rainbow(DIGITAL_LEDS, DIGITAL_LED_COUNT, beat8(40), 35);
+                wave = beat8(40);
+                fill_rainbow(DIGITAL_LEDS, DIGITAL_LED_COUNT, wave, 35);
+                fill_rainbow(ANALOG_LEDS, ANALOG_LED_COUNT, wave, 35);
                 break;
             case 500: // party
                 int entropy;
                 entropy = random16(100, 200);
 
-                EVERY_N_MILLISECONDS(entropy)
+                EVERY_N_MILLISECONDS(entropy * 2)
                 {
                     fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, CRGB::White);
+                    fill_solid(ANALOG_LEDS, ANALOG_LED_COUNT, CRGB::White);
                 }
 
                 EVERY_N_MILLISECONDS(entropy / 3)
                 {
                     fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, CRGB::Black);
+                    fill_solid(ANALOG_LEDS, ANALOG_LED_COUNT, CRGB::Black);
+                    FastLED.show();
+                    analog_show();
                 }
-
-                FastLED.show();
-                FastLED.delay(10);
 
                 if (random8() < 30)
                 {
                     DIGITAL_LEDS[random16(DIGITAL_LED_COUNT)].setHue(random8());
+                    ANALOG_LEDS[random16(ANALOG_LED_COUNT)].setHue(random8());
+                    FastLED.show();
+                    analog_show();
                 }
                 break;
             default:
@@ -124,5 +153,6 @@ void loop()
         }
 
         FastLED.show();
+        analog_show();
     }
 }
