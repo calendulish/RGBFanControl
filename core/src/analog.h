@@ -38,7 +38,28 @@ inline void rgb_hi(uint8_t color)
     *ANALOG_RGB_PORT[color] |= ANALOG_RGB_MASK[color];
 }
 
+inline void auto_lo(uint8_t led)
+{
+    *AUTOEFFECT_LED_PORT[led] &= ~AUTOEFFECT_LED_MASK[led];
+}
+
+inline void auto_hi(uint8_t led)
+{
+    *AUTOEFFECT_LED_PORT[led] |= AUTOEFFECT_LED_MASK[led];
+}
+
 #pragma clang diagnostic pop
+
+void analog_pulse(uint8_t led, uint16_t delay_, uint8_t count)
+{
+    for (uint8_t i = 0; i < count; i++)
+    {
+        auto_hi(led);
+        delay(delay_);
+        auto_lo(led);
+        delay(50);
+    }
+}
 
 void analog_show()
 {

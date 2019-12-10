@@ -97,6 +97,21 @@ void led_options(String *serial_string)
             update_setting(serial_string, config.effect_id, ARRAY_LEN(config.effect_id), 3);
             Serial.println("[le] Effect changed!");
             break;
+        case 'a':
+            int effect_id;
+            effect_id = next_int(serial_string, 2);
+            if (effect_id == -1) break;
+
+            if (effect_id > 10)
+            {
+                Serial.println("[la] Wrong auto effect id");
+                break;
+            }
+
+            config.auto_effect_id = effect_id;
+            AUTO_EFFECT_CHANGED = true;
+            Serial.println("[la] Auto effect changed!");
+            break;
         default:
             Serial.println("[l] Wrong option");
             return;

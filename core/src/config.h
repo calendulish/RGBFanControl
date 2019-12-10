@@ -28,6 +28,12 @@ RwReg ANALOG_RGB_MASK[3];
 volatile RwReg *ANALOG_RGB_PORT[3];
 CRGB ANALOG_LEDS[ANALOG_LED_COUNT] = {};
 
+static const uint8_t AUTOEFFECT_LED_COUNT = 1;
+static const uint8_t AUTOEFFECT_DATA_PIN[AUTOEFFECT_LED_COUNT] = {A5};
+RwReg AUTOEFFECT_LED_MASK[AUTOEFFECT_LED_COUNT];
+volatile RwReg *AUTOEFFECT_LED_PORT[AUTOEFFECT_LED_COUNT];
+bool AUTO_EFFECT_CHANGED;
+
 static const uint8_t FAN_COUNT = 3;
 static const uint8_t FAN_PIN[FAN_COUNT] = {7, 4, 6};
 RwReg FAN_MASK[FAN_COUNT];
@@ -42,6 +48,7 @@ int FAN_SPEED[FAN_COUNT];
 struct config_t
 {
     int effect_id[3];
+    int auto_effect_id;
     int color[3];
     int fan_power[FAN_COUNT];
-} config = {1, 0, 0, 255, 0, 0};
+} config = {1, 0, 0, 0, 255, 0, 0};

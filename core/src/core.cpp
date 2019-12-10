@@ -30,7 +30,7 @@ void setup()
     Serial.println("");
     Serial.println("RGB Cooler Control V3.0.0 <dev@lara.click> 2020");
     Serial.println("Functions:");
-    Serial.println(" - led[effect] <l[e]>");
+    Serial.println(" - led[effect, auto effect] <l[e,a]>");
     Serial.println(" - memory[save, load, clear, enable, disable] <m[s, l, c, e, d]>");
     Serial.println(" - cooler[speed, power] <c[s, p]>");
     Serial.println("");
@@ -46,6 +46,13 @@ void setup()
         pinMode(ANALOG_LED_PIN[pin], OUTPUT);
         ANALOG_LED_MASK[pin] = digitalPinToBitMask(ANALOG_LED_PIN[pin]);
         ANALOG_LED_PORT[pin] = portOutputRegister(digitalPinToPort(ANALOG_LED_PIN[pin]));
+    }
+
+    for (uint8_t pin = 0; pin < AUTOEFFECT_LED_COUNT; pin++)
+    {
+        pinMode(AUTOEFFECT_DATA_PIN[pin], OUTPUT);
+        AUTOEFFECT_LED_MASK[pin] = digitalPinToBitMask(AUTOEFFECT_DATA_PIN[pin]);
+        AUTOEFFECT_LED_PORT[pin] = portOutputRegister(digitalPinToPort(AUTOEFFECT_DATA_PIN[pin]));
     }
 
     for (uint8_t pin = 0; pin < 3; pin++)
@@ -69,6 +76,7 @@ void setup()
         fan_speed_hi(pin);
     }
 
+    AUTO_EFFECT_CHANGED = false;
     set_memory_status(1);
 }
 
@@ -102,6 +110,17 @@ void loop()
     {
         if (fan_speed_read(fan) == 0)
             FAN_SPEED_FREQUENCY[fan] += 1;
+    }
+
+    if (AUTO_EFFECT_CHANGED)
+    {
+        for (uint8_t led = 0; led < AUTOEFFECT_LED_COUNT; led++)
+        {
+            analog_pulse(led, 2000, 1);
+            analog_pulse(led, 50, config.auto_effect_id);
+        }
+
+        AUTO_EFFECT_CHANGED = false;
     }
 
     for (auto effect_id : config.effect_id)
