@@ -76,8 +76,9 @@ void setup()
         fan_speed_hi(pin);
     }
 
-    AUTO_EFFECT_CHANGED = false;
+    AUTO_EFFECT_CHANGED = true;
     set_memory_status(1);
+    memory_load();
 }
 
 
@@ -91,8 +92,8 @@ void loop()
 
     EVERY_N_SECONDS(5)
     {
-        if (memory_status() == 1)
-            memory_load();
+        //if (memory_status() == 1)
+        //    memory_load();
 
         for (uint8_t fan = 0; fan < FAN_COUNT; fan++)
         {
