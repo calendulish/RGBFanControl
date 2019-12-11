@@ -1,3 +1,11 @@
-__pycache__
-.idea
+__pycache__/
+.idea/
+.pio/
 config.ini
+CMakeListsPrivate.txt
+CMakeLists.txt
+include/
+lib/
+test/
+cmake-build-uno/
+core/.gitignore
