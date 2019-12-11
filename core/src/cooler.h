@@ -44,3 +44,13 @@ inline byte fan_speed_read(uint8_t fan)
 }
 
 #pragma clang diagnostic pop
+
+
+// Workaround for back led power
+bool guess_fan_power()
+{
+    for (int fan : FAN_SPEED)
+        if (fan != 0) return true;
+
+    return false;
+}

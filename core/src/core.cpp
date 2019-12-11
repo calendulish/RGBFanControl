@@ -126,6 +126,13 @@ void loop()
         AUTO_EFFECT_CHANGED = false;
     }
 
+    if (!guess_fan_power())
+    {
+        fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, CRGB::Black);
+        FastLED.show();
+        return;
+    }
+
     for (auto effect_id : config.effect_id)
     {
         switch (effect_id)
