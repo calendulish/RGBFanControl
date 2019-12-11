@@ -97,6 +97,12 @@ void led_options(String *serial_string)
             update_setting(serial_string, config.effect_id, ARRAY_LEN(config.effect_id), 3);
             Serial.println("[le] Effect changed!");
             break;
+        case 'c':
+            update_setting(serial_string, config.color, ARRAY_LEN(config.color), 3, nullptr);
+            Serial.println("[lc] Color changed!");
+        case 's':
+            update_setting(serial_string, config.secondary_color, ARRAY_LEN(config.secondary_color), 3, nullptr);
+            Serial.println("[lc] Color changed!");
         case 'a':
             int effect_id;
             effect_id = next_int(serial_string, 2);

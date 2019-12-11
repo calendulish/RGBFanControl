@@ -50,5 +50,6 @@ struct config_t
     int effect_id[3];
     int auto_effect_id;
     int color[3];
+    int secondary_color[3];
     int fan_power[FAN_COUNT];
-} config = {1, 0, 0, 0, 255, 0, 0};
+} config = {1, 0, 0, 0, 255, 0, 0, 0, 0, 255};

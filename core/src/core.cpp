@@ -30,7 +30,7 @@ void setup()
     Serial.println("");
     Serial.println("RGB Cooler Control V3.0.0 <dev@lara.click> 2020");
     Serial.println("Functions:");
-    Serial.println(" - led[effect, auto effect] <l[e,a]>");
+    Serial.println(" - led[effect, color, secondary color, auto effect] <l[e, c, s, a]>");
     Serial.println(" - memory[save, load, clear, enable, disable] <m[s, l, c, e, d]>");
     Serial.println(" - cooler[speed, power] <c[s, p]>");
     Serial.println("");
@@ -88,6 +88,8 @@ void loop()
 
     uint8_t wave;
     CRGB wave_rgb;
+    CRGB color = CRGB(config.color[0], config.color[1], config.color[2]);
+    CRGB secondary_color = CRGB(config.secondary_color[0], config.secondary_color[1], config.secondary_color[2]);
     FastLED.setBrightness(255);
 
     EVERY_N_SECONDS(5)
@@ -142,24 +144,24 @@ void loop()
                 }
                 break;
             case 50: // solid color
-                fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, CRGB::Red);
-                fill_solid(ANALOG_LEDS, ANALOG_LED_COUNT, CRGB::Red);
+                fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, color);
+                fill_solid(ANALOG_LEDS, ANALOG_LED_COUNT, color);
                 break;
             case 100: // two colors
-                fill_gradient_RGB(DIGITAL_LEDS, DIGITAL_LED_COUNT, CRGB::Red, CRGB::Blue);
-                fill_gradient_RGB(ANALOG_LEDS, ANALOG_LED_COUNT, CRGB::Red, CRGB::Blue);
+                fill_gradient_RGB(DIGITAL_LEDS, DIGITAL_LED_COUNT, color, secondary_color);
+                fill_gradient_RGB(ANALOG_LEDS, ANALOG_LED_COUNT, color, secondary_color);
                 break;
             case 101: // two colors gradient
-                wave_rgb = blend(CRGB::Red, CRGB::Blue, beatsin8(10));
+                wave_rgb = blend(color, secondary_color, beatsin8(10));
                 fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, wave_rgb);
                 fill_solid(ANALOG_LEDS, ANALOG_LED_COUNT, wave_rgb);
                 break;
             case 102: // two colors up-down
                 wave = beatsin8(20, 0, DIGITAL_LED_COUNT - 2);
-                fill_gradient_RGB(DIGITAL_LEDS + wave, DIGITAL_LED_COUNT - wave, CRGB::Red, CRGB::Blue);
+                fill_gradient_RGB(DIGITAL_LEDS + wave, DIGITAL_LED_COUNT - wave, color, secondary_color);
 
                 wave = beatsin8(20, 0, ANALOG_LED_COUNT - 2);
-                fill_gradient_RGB(ANALOG_LEDS + wave, ANALOG_LED_COUNT - wave, CRGB::Red, CRGB::Blue);
+                fill_gradient_RGB(ANALOG_LEDS + wave, ANALOG_LED_COUNT - wave, color, secondary_color);
                 break;
             case 200: // rainbow
                 fill_rainbow(DIGITAL_LEDS, DIGITAL_LED_COUNT, 0, 35);
