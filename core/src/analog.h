@@ -41,8 +41,16 @@ inline void rgb_hi(uint8_t color)
 
 void analog_show()
 {
+    uint8_t _delay;
+    uint8_t delay_offset;
+
     for (uint8_t led = 0; led < ANALOG_LED_COUNT; led++)
     {
+        delay_offset = ANALOG_LEDS[led].r / 3;
+        delay_offset += ANALOG_LEDS[led].g / 3;
+        delay_offset += ANALOG_LEDS[led].b / 3;
+        _delay = map(delay_offset, 0, 255, 25, 5);
+
         analog_hi(led);
 
         for (uint8_t color = 0; color < 3; color++)
@@ -50,7 +58,7 @@ void analog_show()
             rgb_hi(color);
 
             for (uint8_t wait = 0; wait < ANALOG_LEDS[led][color]; wait++)
-                delayMicroseconds(16);
+                delayMicroseconds(_delay);
 
             rgb_lo(color);
         }

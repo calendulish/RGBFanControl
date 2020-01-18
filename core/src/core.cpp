@@ -170,7 +170,7 @@ void loop()
                 auto_fill_rainbow(0, 35);
                 break;
             case 201: // rotating rainbow
-                wave = beat8(40);
+                wave = beat8(30);
                 auto_fill_rainbow(wave, 35);
                 break;
             case 500: // party
