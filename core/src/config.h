@@ -15,11 +15,16 @@
  along with this program. If not, see http://www.gnu.org/licenses/.
 */
 
+// comment to disable analog leds support
+#define ANALOG_LEDS_ENABLED
+
 static const uint8_t DIGITAL_LED_COUNT = 30;
 static const uint8_t DIGITAL_DATA_PIN = 8;
 CRGB DIGITAL_LEDS[DIGITAL_LED_COUNT] = {};
 
 static const uint8_t ANALOG_LED_COUNT = 3;
+
+#ifdef ANALOG_LEDS_ENABLED
 static const uint8_t ANALOG_LED_PIN[ANALOG_LED_COUNT] = {12, 3, 5};
 RwReg ANALOG_LED_MASK[ANALOG_LED_COUNT];
 volatile RwReg *ANALOG_LED_PORT[ANALOG_LED_COUNT];
@@ -27,6 +32,7 @@ static const uint8_t ANALOG_RGB_PIN[3] = {10, 11, 9};
 RwReg ANALOG_RGB_MASK[3];
 volatile RwReg *ANALOG_RGB_PORT[3];
 CRGB ANALOG_LEDS[ANALOG_LED_COUNT] = {};
+#endif
 
 static const uint8_t AUTOEFFECT_LED_COUNT = 1;
 static const uint8_t AUTOEFFECT_DATA_PIN[AUTOEFFECT_LED_COUNT] = {A5};

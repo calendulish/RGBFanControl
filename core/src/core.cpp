@@ -38,6 +38,7 @@ void setup()
 
     CFastLED::addLeds<NEOPIXEL, DIGITAL_DATA_PIN>(DIGITAL_LEDS, DIGITAL_LED_COUNT);
 
+#ifdef ANALOG_LEDS_ENABLED
     for (uint8_t pin = 0; pin < ANALOG_LED_COUNT; pin++)
     {
         pinMode(ANALOG_LED_PIN[pin], OUTPUT);
@@ -45,18 +46,19 @@ void setup()
         ANALOG_LED_PORT[pin] = portOutputRegister(digitalPinToPort(ANALOG_LED_PIN[pin]));
     }
 
-    for (uint8_t pin = 0; pin < AUTOEFFECT_LED_COUNT; pin++)
-    {
-        pinMode(AUTOEFFECT_DATA_PIN[pin], OUTPUT);
-        AUTOEFFECT_LED_MASK[pin] = digitalPinToBitMask(AUTOEFFECT_DATA_PIN[pin]);
-        AUTOEFFECT_LED_PORT[pin] = portOutputRegister(digitalPinToPort(AUTOEFFECT_DATA_PIN[pin]));
-    }
-
     for (uint8_t pin = 0; pin < 3; pin++)
     {
         pinMode(ANALOG_RGB_PIN[pin], OUTPUT);
         ANALOG_RGB_MASK[pin] = digitalPinToBitMask(ANALOG_RGB_PIN[pin]);
         ANALOG_RGB_PORT[pin] = portOutputRegister(digitalPinToPort(ANALOG_RGB_PIN[pin]));
+    }
+#endif
+
+    for (uint8_t pin = 0; pin < AUTOEFFECT_LED_COUNT; pin++)
+    {
+        pinMode(AUTOEFFECT_DATA_PIN[pin], OUTPUT);
+        AUTOEFFECT_LED_MASK[pin] = digitalPinToBitMask(AUTOEFFECT_DATA_PIN[pin]);
+        AUTOEFFECT_LED_PORT[pin] = portOutputRegister(digitalPinToPort(AUTOEFFECT_DATA_PIN[pin]));
     }
 
     for (uint8_t pin = 0; pin < FAN_COUNT; pin++)
@@ -159,8 +161,10 @@ void loop()
                 wave = beatsin8(20, 0, DIGITAL_LED_COUNT - 2);
                 fill_gradient_RGB(DIGITAL_LEDS + wave, DIGITAL_LED_COUNT - wave, color, secondary_color);
 
+#ifdef ANALOG_LEDS_ENABLED
                 wave = beatsin8(20, 0, ANALOG_LED_COUNT - 2);
                 fill_gradient_RGB(ANALOG_LEDS + wave, ANALOG_LED_COUNT - wave, color, secondary_color);
+#endif
                 break;
             case 200: // rainbow
                 auto_fill_rainbow(0, 35);

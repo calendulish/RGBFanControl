@@ -26,31 +26,46 @@
 void auto_fill_solid(const struct CRGB& color)
 {
     fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, color);
+
+#ifdef ANALOG_LEDS_ENABLED
     fill_solid(ANALOG_LEDS, ANALOG_LED_COUNT, color);
+#endif
 }
 
 void auto_fill_rainbow(uint8_t initialhue, uint8_t deltahue = 5)
 {
     fill_rainbow(DIGITAL_LEDS, DIGITAL_LED_COUNT, initialhue, deltahue);
+
+#ifdef ANALOG_LEDS_ENABLED
     fill_rainbow(ANALOG_LEDS, ANALOG_LED_COUNT, initialhue, deltahue);
+#endif
 }
 
 void auto_fill_gradient_RGB(const CRGB &c1, const CRGB &c2)
 {
     fill_gradient_RGB(DIGITAL_LEDS, DIGITAL_LED_COUNT, c1, c2);
+
+#ifdef ANALOG_LEDS_ENABLED
     fill_gradient_RGB(ANALOG_LEDS, ANALOG_LED_COUNT, c1, c2);
+#endif
 }
 
 void auto_hue(uint8_t led, uint8_t hue)
 {
     DIGITAL_LEDS[led].setHue(hue);
+
+#ifdef ANALOG_LEDS_ENABLED
     ANALOG_LEDS[led].setHue(hue);
+#endif
 }
 
 void auto_show()
 {
     FastLED.show();
+
+#ifdef ANALOG_LEDS_ENABLED
     analog_show();
+#endif
 }
 
 #endif /* CORE_H */

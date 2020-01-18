@@ -18,6 +18,7 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "hicpp-signed-bitwise"
 
+#ifdef ANALOG_LEDS_ENABLED
 inline void analog_lo(uint8_t led)
 {
     *ANALOG_LED_PORT[led] &= ~ANALOG_LED_MASK[led];
@@ -37,6 +38,27 @@ inline void rgb_hi(uint8_t color)
 {
     *ANALOG_RGB_PORT[color] |= ANALOG_RGB_MASK[color];
 }
+
+void analog_show()
+{
+    for (uint8_t led = 0; led < ANALOG_LED_COUNT; led++)
+    {
+        analog_hi(led);
+
+        for (uint8_t color = 0; color < 3; color++)
+        {
+            rgb_hi(color);
+
+            for (uint8_t wait = 0; wait < ANALOG_LEDS[led][color]; wait++)
+                delayMicroseconds(16);
+
+            rgb_lo(color);
+        }
+
+        analog_lo(led);
+    }
+}
+#endif
 
 inline void auto_lo(uint8_t led)
 {
@@ -58,25 +80,5 @@ void analog_pulse(uint8_t led, uint16_t delay_, uint8_t count)
         delay(delay_);
         auto_lo(led);
         delay(50);
-    }
-}
-
-void analog_show()
-{
-    for (uint8_t led = 0; led < ANALOG_LED_COUNT; led++)
-    {
-        analog_hi(led);
-
-        for (uint8_t color = 0; color < 3; color++)
-        {
-            rgb_hi(color);
-
-            for (uint8_t wait = 0; wait < ANALOG_LEDS[led][color]; wait++)
-                delayMicroseconds(16);
-
-            rgb_lo(color);
-        }
-
-        analog_lo(led);
     }
 }
