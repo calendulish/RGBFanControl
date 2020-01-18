@@ -205,6 +205,32 @@ void loop()
                     analog_show();
                 }
                 break;
+            case 501: //police
+                EVERY_N_MILLISECONDS(50)
+                {
+                    fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, CRGB::Black);
+                    FastLED.show();
+                    analog_show();
+                }
+
+                EVERY_N_MILLISECONDS(90)
+                {
+                    wave = beatsin8(50, 0, 50);
+                    if(wave < 10)
+                    {
+                        fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT / 2, color);
+                    }
+
+                    if(wave > 10 && wave < 30)
+                    {
+                        fill_solid(DIGITAL_LEDS+DIGITAL_LED_COUNT / 2, DIGITAL_LED_COUNT / 2, secondary_color);
+                    }
+                    if(wave > 30)
+                    {
+                        fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, CRGB::Black);
+                    }
+                }
+                break;
             default:
                 continue;
         }
