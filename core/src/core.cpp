@@ -15,10 +15,7 @@
  along with this program. If not, see http://www.gnu.org/licenses/.
 */
 
-#include <Arduino.h>
-#include <FastLED.h>
-#include "config.h"
-#include "analog.h"
+#include "core.h"
 #include "memory.h"
 #include "serial.h"
 #include "cooler.h"
@@ -141,27 +138,22 @@ void loop()
                 FastLED.setBrightness(beatsin8(10));
                 break;
             case 2: // pulse
-            EVERY_N_MILLISECONDS(400)
+                EVERY_N_MILLISECONDS(400)
                 {
-                    fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, CRGB::Black);
-                    fill_solid(ANALOG_LEDS, ANALOG_LED_COUNT, CRGB::Black);
-                    FastLED.show();
-                    analog_show();
+                    auto_fill_solid(CRGB::Black);
+                    auto_show();
                     FastLED.delay(200);
                 }
                 break;
             case 50: // solid color
-                fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, color);
-                fill_solid(ANALOG_LEDS, ANALOG_LED_COUNT, color);
+                auto_fill_solid(color);
                 break;
             case 100: // two colors
-                fill_gradient_RGB(DIGITAL_LEDS, DIGITAL_LED_COUNT, color, secondary_color);
-                fill_gradient_RGB(ANALOG_LEDS, ANALOG_LED_COUNT, color, secondary_color);
+                auto_fill_gradient_RGB(color, secondary_color);
                 break;
             case 101: // two colors gradient
                 wave_rgb = blend(color, secondary_color, beatsin8(10));
-                fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, wave_rgb);
-                fill_solid(ANALOG_LEDS, ANALOG_LED_COUNT, wave_rgb);
+                auto_fill_solid(wave_rgb);
                 break;
             case 102: // two colors up-down
                 wave = beatsin8(20, 0, DIGITAL_LED_COUNT - 2);
@@ -171,13 +163,11 @@ void loop()
                 fill_gradient_RGB(ANALOG_LEDS + wave, ANALOG_LED_COUNT - wave, color, secondary_color);
                 break;
             case 200: // rainbow
-                fill_rainbow(DIGITAL_LEDS, DIGITAL_LED_COUNT, 0, 35);
-                fill_rainbow(ANALOG_LEDS, ANALOG_LED_COUNT, 0, 35);
+                auto_fill_rainbow(0, 35);
                 break;
             case 201: // rotating rainbow
                 wave = beat8(40);
-                fill_rainbow(DIGITAL_LEDS, DIGITAL_LED_COUNT, wave, 35);
-                fill_rainbow(ANALOG_LEDS, ANALOG_LED_COUNT, wave, 35);
+                auto_fill_rainbow(wave, 35);
                 break;
             case 500: // party
                 int entropy;
@@ -185,32 +175,26 @@ void loop()
 
                 EVERY_N_MILLISECONDS(entropy * 2)
                 {
-                    fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, CRGB::White);
-                    fill_solid(ANALOG_LEDS, ANALOG_LED_COUNT, CRGB::White);
+                    auto_fill_solid(CRGB::White);
                 }
 
                 EVERY_N_MILLISECONDS(entropy / 3)
                 {
-                    fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, CRGB::Black);
-                    fill_solid(ANALOG_LEDS, ANALOG_LED_COUNT, CRGB::Black);
-                    FastLED.show();
-                    analog_show();
+                    auto_fill_solid(CRGB::Black);
+                    auto_show();
                 }
 
                 if (random8() < 30)
                 {
-                    DIGITAL_LEDS[random16(DIGITAL_LED_COUNT)].setHue(random8());
-                    ANALOG_LEDS[random16(ANALOG_LED_COUNT)].setHue(random8());
-                    FastLED.show();
-                    analog_show();
+                    auto_hue(random16(DIGITAL_LED_COUNT), random8());
+                    auto_show();
                 }
                 break;
             case 501: //police
                 EVERY_N_MILLISECONDS(50)
                 {
-                    fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, CRGB::Black);
-                    FastLED.show();
-                    analog_show();
+                    auto_fill_solid(CRGB::Black);
+                    auto_show();
                 }
 
                 EVERY_N_MILLISECONDS(90)
@@ -227,7 +211,7 @@ void loop()
                     }
                     if(wave > 30)
                     {
-                        fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT, CRGB::Black);
+                        auto_fill_solid(CRGB::Black);
                     }
                 }
                 break;
@@ -235,7 +219,6 @@ void loop()
                 continue;
         }
 
-        FastLED.show();
-        analog_show();
+        auto_show();
     }
 }
