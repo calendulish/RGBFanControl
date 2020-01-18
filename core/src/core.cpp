@@ -27,7 +27,7 @@ void setup()
     Serial.println("");
     Serial.println("RGB Cooler Control V3.0.0 <dev@lara.click> 2020");
     Serial.println("Functions:");
-    Serial.println(" - led[effect, color, secondary color, auto effect] <l[e, c, s, a]>");
+    Serial.println(" - led[brightness, effect, color, secondary color, auto effect] <l[b, e, c, s, a]>");
     Serial.println(" - memory[save, load, clear, enable, disable] <m[s, l, c, e, d]>");
     Serial.println(" - cooler[speed, power] <c[s, p]>");
     Serial.println("");
@@ -89,7 +89,7 @@ void loop()
     CRGB wave_rgb;
     CRGB color = CRGB(config.color[0], config.color[1], config.color[2]);
     CRGB secondary_color = CRGB(config.secondary_color[0], config.secondary_color[1], config.secondary_color[2]);
-    FastLED.setBrightness(255);
+    FastLED.setBrightness(config.brightness);
 
     EVERY_N_SECONDS(5)
     {

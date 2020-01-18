@@ -93,6 +93,20 @@ void led_options(String *serial_string)
 
     switch (option)
     {
+        case 'b':
+            int brightness;
+            brightness = next_int(serial_string, 3);
+            if (brightness == -1) break;
+
+            if (brightness > 255)
+            {
+                Serial.println("[lb] Wrong brightness value");
+                break;
+            }
+
+            config.brightness = brightness;
+            Serial.println("[lb] Brightness changed!");
+            break;
         case 'e':
             update_setting(serial_string, config.effect_id, ARRAY_LEN(config.effect_id), 3);
             Serial.println("[le] Effect changed!");
