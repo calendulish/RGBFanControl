@@ -166,6 +166,18 @@ void loop()
                 fill_gradient_RGB(ANALOG_LEDS + wave, ANALOG_LED_COUNT - wave, color, secondary_color);
 #endif
                 break;
+            case 103: // two colors random
+                EVERY_N_MILLISECONDS(20)
+                {
+                    fadeToBlackBy(DIGITAL_LEDS, DIGITAL_LED_COUNT, 15);
+
+                    if(random8() < 20)
+                    {
+                        auto_random_led_rgb(color);
+                        auto_random_led_rgb(secondary_color);
+                    }
+                }
+                break;
             case 200: // rainbow
                 auto_fill_rainbow(0, 35);
                 break;
@@ -190,7 +202,7 @@ void loop()
 
                 if (random8() < 30)
                 {
-                    auto_hue(random16(DIGITAL_LED_COUNT), random8());
+                    auto_random_led_hue(random8());
                     auto_show();
                 }
                 break;
@@ -206,12 +218,12 @@ void loop()
                     wave = beatsin8(50, 0, 50);
                     if(wave < 10)
                     {
-                        fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT / 2, color);
+                        fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT / 2, CRGB::Red);
                     }
 
                     if(wave > 10 && wave < 30)
                     {
-                        fill_solid(DIGITAL_LEDS+DIGITAL_LED_COUNT / 2, DIGITAL_LED_COUNT / 2, secondary_color);
+                        fill_solid(DIGITAL_LEDS+DIGITAL_LED_COUNT / 2, DIGITAL_LED_COUNT / 2, CRGB::Blue);
                     }
                     if(wave > 30)
                     {

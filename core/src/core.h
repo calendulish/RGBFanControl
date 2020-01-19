@@ -50,12 +50,21 @@ void auto_fill_gradient_RGB(const CRGB &c1, const CRGB &c2)
 #endif
 }
 
-void auto_hue(uint8_t led, uint8_t hue)
+void auto_random_led_hue(uint8_t hue)
 {
-    DIGITAL_LEDS[led].setHue(hue);
+    DIGITAL_LEDS[random16(DIGITAL_LED_COUNT)].setHue(hue);
 
 #ifdef ANALOG_LEDS_ENABLED
-    ANALOG_LEDS[led].setHue(hue);
+    ANALOG_LEDS[random16(ANALOG_LED_COUNT)].setHue(hue);
+#endif
+}
+
+void auto_random_led_rgb(const CRGB& rgb)
+{
+    DIGITAL_LEDS[random16(DIGITAL_LED_COUNT)] = rgb;
+
+#ifdef ANALOG_LEDS_ENABLED
+    ANALOG_LEDS[random16(ANALOG_LED_COUNT)] = rgb;
 #endif
 }
 
