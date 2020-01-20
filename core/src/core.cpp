@@ -166,7 +166,16 @@ void loop()
                 fill_gradient_RGB(ANALOG_LEDS + wave, ANALOG_LED_COUNT - wave, color, secondary_color);
 #endif
                 break;
-            case 103: // two colors random
+            case 103: // two colors up-down oposite
+                EVERY_N_MILLISECONDS(10)
+                {
+                    fadeToBlackBy(DIGITAL_LEDS, DIGITAL_LED_COUNT, 60);
+                    wave = beatsin16(15, 0, DIGITAL_LED_COUNT-1);
+                    DIGITAL_LEDS[wave] = color;
+                    DIGITAL_LEDS[map(wave, 0, DIGITAL_LED_COUNT-1, DIGITAL_LED_COUNT-1, 0)] = secondary_color;
+                }
+                break;
+            case 104: // two colors random
                 EVERY_N_MILLISECONDS(20)
                 {
                     fadeToBlackBy(DIGITAL_LEDS, DIGITAL_LED_COUNT, 15);
