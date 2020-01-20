@@ -150,6 +150,11 @@ void loop()
             case 50: // solid color
                 auto_fill_solid(color);
                 break;
+            case 51: // solid color rotating
+                fadeToBlackBy(DIGITAL_LEDS, DIGITAL_LED_COUNT, 20);
+                wave = beatsin16(30, 0, DIGITAL_LED_COUNT-1);
+                DIGITAL_LEDS[wave] = color;
+                break;
             case 100: // two colors
                 auto_fill_gradient_RGB(color, secondary_color);
                 break;
