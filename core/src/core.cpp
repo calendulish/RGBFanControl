@@ -136,6 +136,12 @@ void loop()
     {
         switch (effect_id)
         {
+            case 0: // disable
+                if(config.effect_id[0] == 0 &&
+                   config.effect_id[1] == 0 &&
+                   config.effect_id[2] == 0)
+                    auto_fill_solid(CRGB::Black);
+                break;
             case 1: // fade
                 FastLED.setBrightness(beatsin8(10));
                 break;
