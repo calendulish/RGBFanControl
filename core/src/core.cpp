@@ -161,6 +161,11 @@ void loop()
                 auto_fadeToBlackBy(20);
                 wave = beatsin16(30, 0, DIGITAL_LED_COUNT-1);
                 DIGITAL_LEDS[wave] = color;
+
+#ifdef ANALOG_LEDS_ENABLED
+                wave = beatsin16(30, 0, ANALOG_LED_COUNT-1);
+                ANALOG_LEDS[wave] = color;
+#endif
                 break;
             case 100: // two colors
                 auto_fill_gradient_RGB(0, color, secondary_color);
@@ -178,7 +183,15 @@ void loop()
                     auto_fadeToBlackBy(60);
                     wave = beatsin16(15, 0, DIGITAL_LED_COUNT-1);
                     DIGITAL_LEDS[wave] = color;
-                    DIGITAL_LEDS[map(wave, 0, DIGITAL_LED_COUNT-1, DIGITAL_LED_COUNT-1, 0)] = secondary_color;
+                    wave = map(wave, 0, DIGITAL_LED_COUNT-1, DIGITAL_LED_COUNT-1, 0);
+                    DIGITAL_LEDS[wave] = secondary_color;
+
+#ifdef ANALOG_LEDS_ENABLED
+                    wave = beatsin16(15, 0, ANALOG_LED_COUNT-1);
+                    ANALOG_LEDS[wave] = color;
+                    wave = map(wave, 0, ANALOG_LED_COUNT-1, ANALOG_LED_COUNT-1, 0);
+                    ANALOG_LEDS[wave] = secondary_color;
+#endif
                 }
                 break;
             case 104: // two colors random
@@ -234,11 +247,20 @@ void loop()
                     if(wave < 10)
                     {
                         fill_solid(DIGITAL_LEDS, DIGITAL_LED_COUNT / 2, CRGB::Red);
+#ifdef ANALOG_LEDS_ENABLED
+                        //fill_solid(ANALOG_LEDS, ANALOG_LED_COUNT / 2, CRGB::Red);
+                        // custom 2 X 1
+                        ANALOG_LEDS[0] = CRGB::Red;
+                        ANALOG_LEDS[2] = CRGB::Red;
+#endif
                     }
 
                     if(wave > 10 && wave < 30)
                     {
                         fill_solid(DIGITAL_LEDS+DIGITAL_LED_COUNT / 2, DIGITAL_LED_COUNT / 2, CRGB::Blue);
+#ifdef ANALOG_LEDS_ENABLED
+                        fill_solid(ANALOG_LEDS+ANALOG_LED_COUNT / 2, ANALOG_LED_COUNT / 2, CRGB::Blue);
+#endif
                     }
                     if(wave > 30)
                     {
@@ -268,9 +290,9 @@ void loop()
                     DIGITAL_LEDS[DIGITAL_CUSTOM_LED_COUNT] = DIGITAL_CUSTOM_COLOR;
                 }
 
+#ifdef ANALOG_LEDS_ENABLED
                 EVERY_N_MILLISECONDS(250)
                 {
-#ifdef ANALOG_LEDS_ENABLED
                     fadeToBlackBy(ANALOG_LEDS, ANALOG_LED_COUNT, 60*2);
 
                     ANALOG_CUSTOM_LED_COUNT++;
@@ -288,8 +310,8 @@ void loop()
                     }
 
                     ANALOG_LEDS[ANALOG_CUSTOM_LED_COUNT] = ANALOG_CUSTOM_COLOR;
-#endif
                 }
+#endif
                 break;
             default:
                 continue;
