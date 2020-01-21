@@ -56,10 +56,7 @@ void analog_show()
         for (uint8_t color = 0; color < 3; color++)
         {
             rgb_hi(color);
-
-            for (uint8_t wait = 0; wait < ANALOG_LEDS[led][color]; wait++)
-                delayMicroseconds(_delay);
-
+            delayMicroseconds(_delay * ANALOG_LEDS[led][color]);
             rgb_lo(color);
         }
 
