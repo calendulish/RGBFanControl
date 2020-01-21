@@ -21,6 +21,7 @@ import serial
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
+from time import sleep
 
 import config
 import window
@@ -42,7 +43,7 @@ class RGBFanControl(Gtk.Application):
         return self.get_window_by_id(self._main_window_id)
 
     def do_activate(self) -> None:
-        self.send_serial('de')
+        self.send_serial('md')
         main_window = window.Main(application=self, title="RGBFanControl")
         self._main_window_id = main_window.get_id()
         main_window.show()
@@ -71,14 +72,15 @@ class RGBFanControl(Gtk.Application):
         self._serial.open()
         self._serial.write(message.encode())
         self._serial.close()
+        sleep(0.1)
 
     def on_about_activate(self, action: Gio.Action, data: str) -> None:
         about_dialog = about.AboutWindow(parent_window=self.main_window)
         about_dialog.show()
 
     def on_exit_activate(self, action: Gio.Action, data: str) -> None:
-        self.send_serial('se')
-        self.send_serial('ee')
+        # self.send_serial('ms')
+        self.send_serial('me')
         self.quit()
 
 

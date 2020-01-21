@@ -20,7 +20,37 @@ import gi
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
+from collections import OrderedDict
 import utils
+import config
+
+primary_effects_dict = OrderedDict([
+    ("000", "Disabled"),
+    ("050", "Solid Color"),
+    ("051", "Solid Color Rotating"),
+    ("100", "Two Colors"),
+    ("101", "Two Colors Gradient"),
+    ("102", "Two Colors Up-Down"),
+    ("103", "Two Colors Up-Down Oposite"),
+    ("200", "Rainbow"),
+    ("201", "Rainbow Rotating"),
+])
+
+secondary_effects_dict = OrderedDict([
+    ("000", "Disabled"),
+    ("001", "Fade"),
+    ("002", "Pulse"),
+])
+
+extra_effects_dict = OrderedDict([
+    ("000", "Disabled"),
+    ("104", "Two Colors Random"),
+    ("500", "Party"),
+    ("501", "Police"),
+    ("502", "RGB Cycle"),
+])
+
+extra_effect_block_list = ["050", "100", "101", "200", "201"]
 
 
 class Main(Gtk.ApplicationWindow):
@@ -48,7 +78,7 @@ class Main(Gtk.ApplicationWindow):
         header_bar.pack_end(menu_button)
 
         self.set_titlebar(header_bar)
-        #self.set_default_size(650, 450)
+        # self.set_default_size(650, 450)
         self.set_resizable(False)
         self.set_position(Gtk.WindowPosition.CENTER)
         self.set_title(title)
@@ -60,27 +90,85 @@ class Main(Gtk.ApplicationWindow):
         main_grid.set_column_homogeneous(True)
         self.add(main_grid)
 
-        fan1 = utils.FFanSettings(application, 0)
-        fan2 = utils.FFanSettings(application, 1)
-        fan3 = utils.FFanSettings(application, 2)
-        fan_all = utils.FFanSettings(application, -1)
-        fan_neo = utils.BFanSettings(application, 0)
+        settings_section = utils.Section("effects", "Effects")
+        main_grid.attach(settings_section, 0, 0, 1, 1)
 
-        notebook = Gtk.Notebook()
-        main_grid.attach(notebook, 0, 0, 1, 1)
+        self.primary_effect = settings_section.new(
+            "primary_effect",
+            "Primary Effect",
+            Gtk.ComboBoxText,
+            0, 0,
+            items=primary_effects_dict
+        )
 
-        notebook.append_page(fan1, Gtk.Label("Fan 1"))
-        notebook.append_page(fan2, Gtk.Label("Fan 2"))
-        notebook.append_page(fan3, Gtk.Label("Fan 3"))
-        notebook.append_page(fan_neo, Gtk.Label("Neo"))
-        notebook.append_page(fan_all, Gtk.Label("All"))
+        self.secondary_effect = settings_section.new(
+            "secondary_effect",
+            "Secondary Effect",
+            Gtk.ComboBoxText,
+            0, 1,
+            items=secondary_effects_dict
+        )
+
+        self.extra_effect = settings_section.new(
+            "extra_effect",
+            "Extra Effect",
+            Gtk.ComboBoxText,
+            0, 2,
+            items=extra_effects_dict
+        )
+
+        self.primary_effect.connect("changed", self.on_effects_changed)
+        self.secondary_effect.connect("changed", self.on_effects_changed)
+        self.extra_effect.connect("changed", self.on_effects_changed)
+        self.primary_effect.load()
+        self.secondary_effect.load()
+        self.extra_effect.load()
 
         reset = Gtk.Button("Reset Arduino")
         reset.connect('clicked', self.on_reset_clicked)
         main_grid.attach(reset, 0, 1, 1, 1)
 
+        save = Gtk.Button("EEPROM Save")
+        save.connect('clicked', self.on_save_clicked)
+        main_grid.attach(save, 0, 2, 1, 1)
+
         self.connect("destroy", self.application.on_exit_activate, None)
         self.show_all()
 
+    def on_effects_changed(self, combo: Gtk.ComboBoxText) -> None:
+        self.primary_effect.set_sensitive(True)
+        self.secondary_effect.set_sensitive(True)
+        name = combo.get_name()
+
+        if name == "primary_effect":
+            effect = list(primary_effects_dict)[combo.get_active()]
+
+            if effect in extra_effect_block_list:
+                self.extra_effect.set_active(0)
+                self.extra_effect.set_sensitive(False)
+            else:
+                self.extra_effect.set_sensitive(True)
+        elif name == "secondary_effect":
+            effect = list(secondary_effects_dict)[combo.get_active()]
+        else:
+            effect = list(extra_effects_dict)[combo.get_active()]
+
+        if self.primary_effect.get_active() == 0:
+            self.secondary_effect.set_active(0)
+            self.secondary_effect.set_sensitive(False)
+
+        config.new('effects', name, effect)
+
+        serial_message = 'le'
+        serial_message += config.parser.get("effects", "extra_effect")
+        serial_message += config.parser.get("effects", "secondary_effect")
+        serial_message += config.parser.get("effects", "primary_effect")
+        self.application.send_serial(serial_message)
+
     def on_reset_clicked(self, button: Gtk.Button) -> None:
         self.application.do_reset()
+
+    def on_save_clicked(self, button: Gtk.Button) -> None:
+        serial_message = 'ms'
+        self.application.send_serial(serial_message)
+        button.set_label("Saved!")

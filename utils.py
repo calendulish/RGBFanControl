@@ -16,13 +16,129 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
+import logging
+from collections import OrderedDict
+from typing import Callable, Any, Union, Optional
+
 from gi.repository import Gtk, Gdk
 
 import config
 
+log = logging.getLogger(__name__)
+
 
 def _led_color_to_rgba(led_color: str) -> Gdk.RGBA:
     return Gdk.RGBA(*[int(led_color[c * 3:3 + c * 3]) / 255.0 for c in range(int(len(led_color) / 3))])
+
+
+class Section(Gtk.Frame):
+    def __init__(self, name: str, label: str) -> None:
+        super().__init__(label=label)
+        self.set_label_align(0.03, 0.5)
+        self.set_name(name)
+
+        self.grid = Gtk.Grid()
+        self.grid.set_name(name)
+        self.grid.set_row_spacing(10)
+        self.grid.set_column_spacing(10)
+        self.grid.set_border_width(10)
+
+        self.add(self.grid)
+
+    def __item_factory(self, children: Callable[..., Gtk.Widget]) -> Any:
+        # FIXME: https://github.com/python/mypy/issues/2477
+        children_ = children  # type: Any
+
+        class Item(children_):
+            def __init__(self, name: str, section_name: str, label: str, items: Optional[OrderedDict]) -> None:
+                super().__init__()
+                self._name = name
+                self._items = items
+
+                self.label = Gtk.Label(label)
+                self.label.set_name(name)
+                self.label.set_halign(Gtk.Align.START)
+
+                self.set_hexpand(True)
+                self.set_name(name)
+                self._section_name = section_name
+
+            def show_all(self) -> None:
+                self.label.show()
+                super().show()
+
+            def hide(self) -> None:
+                self.label.hide()
+                super().hide()
+
+            def get_section_name(self) -> str:
+                assert isinstance(self._section_name, str)
+                return self._section_name
+
+            def load(self) -> None:
+                # noinspection PyUnusedLocal
+                value: Union[str, bool, int]
+
+                if self._name.startswith('_'):
+                    return
+
+                if isinstance(self, Gtk.ComboBoxText):
+                    value = config.parser.get(self._section_name, self._name)
+
+                    try:
+                        current_option = list(self._items).index(value)
+                    except ValueError:
+                        error_message = "Please, fix your config file. Accepted values for {} are:\n{}".format(
+                            self._name,
+                            ', '.join(self._items.keys()),
+                        )
+                        log.exception(error_message)
+                        fatal_error_dialog(error_message)
+                        # unset active self
+                        current_option = -1
+
+                    self.set_active(current_option)
+
+                if isinstance(self, Gtk.CheckButton):
+                    value = config.parser.getboolean(self._section_name, self._name)
+                    self.set_active(value)
+
+        return Item
+
+    def new(
+            self,
+            name: str,
+            label: str,
+            children: Callable[..., Gtk.Widget],
+            *grid_position: int,
+            items: 'OrderedDict[str, str]' = None,
+    ) -> Gtk.Widget:
+        item = self.__item_factory(children)(name, self.get_name(), label, items)
+
+        self.grid.attach(item.label, *grid_position, 1, 1)
+        self.grid.attach_next_to(item, item.label, Gtk.PositionType.RIGHT, 1, 1)
+
+        section = self.get_name()
+        option = item.get_name()
+        # noinspection PyUnusedLocal
+        value: Union[str, bool, int]
+
+        if option.startswith('_'):
+            return item
+
+        if isinstance(item, Gtk.ComboBoxText):
+            value = config.parser.get(section, option)
+
+            for value_ in items.values():
+                item.append_text(value_)
+
+        if isinstance(item, Gtk.Entry):
+            value = config.parser.get(section, option)
+
+            if value:
+                item.set_text(value)
+
+        return item
 
 
 class BFanSettings(Gtk.Frame):
@@ -100,6 +216,15 @@ class BFanSettings(Gtk.Frame):
         config.new("back", "effect", str(effect))
         serial_message += config.parser.get("back", "effect")
         self.application.send_serial(serial_message)
+
+
+def fatal_error_dialog(error_message: str, transient_for: Optional[Gtk.Window] = None) -> None:
+    log.critical(error_message)
+    error_dialog = Gtk.MessageDialog(transient_for=transient_for)
+    error_dialog.set_title("Fatal Error")
+    error_dialog.set_markup(error_message)
+    error_dialog.set_position(Gtk.WindowPosition.CENTER)
+    error_dialog.run()
 
 
 class FFanSettings(Gtk.Frame):
