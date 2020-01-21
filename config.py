@@ -43,7 +43,13 @@ def init() -> None:
                 'primary_effect': '050',
                 'secondary_effect': '000',
                 'extra_effect': '000',
+                'primary_color': '255000000',
+                'secondary_color': '000000255',
             },
+            'advanced': {
+                'speed': '20',
+                'brightness': '125',
+            }
         }
     )
 

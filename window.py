@@ -51,6 +51,9 @@ extra_effects_dict = OrderedDict([
 ])
 
 extra_effect_block_list = ["050", "100", "101", "200", "201"]
+color_effect_block_list = ["200", "201", "500", "501", "502"]
+primary_color_effect_block_list = [] + color_effect_block_list
+secondary_color_effect_block_list = ["050", "051"] + color_effect_block_list
 
 
 class Main(Gtk.ApplicationWindow):
@@ -90,10 +93,18 @@ class Main(Gtk.ApplicationWindow):
         main_grid.set_column_homogeneous(True)
         self.add(main_grid)
 
-        settings_section = utils.Section("effects", "Effects")
-        main_grid.attach(settings_section, 0, 0, 1, 1)
+        effects_section = utils.Section("effects", "Effects")
+        main_grid.attach(effects_section, 0, 0, 1, 1)
 
-        self.primary_effect = settings_section.new(
+        self.primary_color = effects_section.new("primary_color", "Primary Color", Gtk.ColorButton, 0, 3)
+        self.primary_color.connect("notify::color", self.on_color_changed)
+        self.primary_color.load()
+
+        self.secondary_color = effects_section.new("secondary_color", "Secondary Color", Gtk.ColorButton, 0, 4)
+        self.secondary_color.connect("notify::color", self.on_color_changed)
+        self.secondary_color.load()
+
+        self.primary_effect = effects_section.new(
             "primary_effect",
             "Primary Effect",
             Gtk.ComboBoxText,
@@ -101,7 +112,7 @@ class Main(Gtk.ApplicationWindow):
             items=primary_effects_dict
         )
 
-        self.secondary_effect = settings_section.new(
+        self.secondary_effect = effects_section.new(
             "secondary_effect",
             "Secondary Effect",
             Gtk.ComboBoxText,
@@ -109,7 +120,7 @@ class Main(Gtk.ApplicationWindow):
             items=secondary_effects_dict
         )
 
-        self.extra_effect = settings_section.new(
+        self.extra_effect = effects_section.new(
             "extra_effect",
             "Extra Effect",
             Gtk.ComboBoxText,
@@ -124,6 +135,17 @@ class Main(Gtk.ApplicationWindow):
         self.secondary_effect.load()
         self.extra_effect.load()
 
+        advanced_section = utils.Section("advanced", "Advanced")
+        main_grid.attach(advanced_section, 1, 0, 1, 1)
+
+        speed = advanced_section.new("speed", "Speed", Gtk.Scale, 0, 0)
+        speed.connect('change-value', self.on_scale_changed)
+        speed.load()
+
+        brightness = advanced_section.new("brightness", "Brightness", Gtk.Scale, 0, 1)
+        brightness.connect('change-value', self.on_scale_changed)
+        brightness.load()
+
         reset = Gtk.Button("Reset Arduino")
         reset.connect('clicked', self.on_reset_clicked)
         main_grid.attach(reset, 0, 1, 1, 1)
@@ -135,9 +157,26 @@ class Main(Gtk.ApplicationWindow):
         self.connect("destroy", self.application.on_exit_activate, None)
         self.show_all()
 
+    def on_scale_changed(self, scale: Gtk.Scale, type_=str, value=str) -> None:
+        name = scale.get_name()
+
+        if int(value) > 255:
+            value = "255"
+        elif int(value) < 0:
+            value = "0"
+        else:
+            value = str(int(value))
+
+        config.new("advanced", name, value)
+
+        serial_message = 'l{}{:0=3d}'.format(name[0:1], int(value))
+        self.application.send_serial(serial_message)
+
     def on_effects_changed(self, combo: Gtk.ComboBoxText) -> None:
         self.primary_effect.set_sensitive(True)
         self.secondary_effect.set_sensitive(True)
+        self.primary_color.set_sensitive(True)
+        self.secondary_color.set_sensitive(True)
         name = combo.get_name()
 
         if name == "primary_effect":
@@ -157,12 +196,37 @@ class Main(Gtk.ApplicationWindow):
             self.secondary_effect.set_active(0)
             self.secondary_effect.set_sensitive(False)
 
+        if self.extra_effect.get_active() == 0 or self.primary_effect.get_active() == 0:
+            current_effect_list = [
+                list(primary_effects_dict)[self.primary_effect.get_active()],
+                list(extra_effects_dict)[self.extra_effect.get_active()],
+            ]
+
+            if any((effect in primary_color_effect_block_list) for effect in current_effect_list):
+                self.primary_color.set_sensitive(False)
+
+            if any((effect in secondary_color_effect_block_list) for effect in current_effect_list):
+                self.secondary_color.set_sensitive(False)
+
         config.new('effects', name, effect)
 
         serial_message = 'le'
         serial_message += config.parser.get("effects", "extra_effect")
         serial_message += config.parser.get("effects", "secondary_effect")
         serial_message += config.parser.get("effects", "primary_effect")
+        self.application.send_serial(serial_message)
+
+    def on_color_changed(self, color_button: Gtk.ColorButton, param: str) -> None:
+        name = color_button.get_name()
+        color_string = utils.rgba_to_led_color(color_button.get_rgba())
+        config.new("effects", name, color_string)
+
+        if name == "primary_color":
+            serial_message = "lc"
+        else:
+            serial_message = "ls"
+
+        serial_message += color_string
         self.application.send_serial(serial_message)
 
     def on_reset_clicked(self, button: Gtk.Button) -> None:

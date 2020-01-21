@@ -27,8 +27,12 @@ import config
 log = logging.getLogger(__name__)
 
 
-def _led_color_to_rgba(led_color: str) -> Gdk.RGBA:
+def led_color_to_rgba(led_color: str) -> Gdk.RGBA:
     return Gdk.RGBA(*[int(led_color[c * 3:3 + c * 3]) / 255.0 for c in range(int(len(led_color) / 3))])
+
+
+def rgba_to_led_color(rgba: Gdk.RGBA) -> str:
+    return ''.join(['{:0=3d}'.format(int(color)) for color in rgba.to_string()[4:-1].split(',')])
 
 
 class Section(Gtk.Frame):
@@ -103,6 +107,14 @@ class Section(Gtk.Frame):
                     value = config.parser.getboolean(self._section_name, self._name)
                     self.set_active(value)
 
+                if isinstance(self, Gtk.Scale):
+                    value = config.parser.getint(self._section_name, self._name)
+                    self.set_value(value)
+
+                if isinstance(self, Gtk.ColorButton):
+                    value = config.parser.get(self._section_name, self._name)
+                    self.set_rgba(led_color_to_rgba(value))
+
         return Item
 
     def new(
@@ -137,6 +149,9 @@ class Section(Gtk.Frame):
 
             if value:
                 item.set_text(value)
+
+        if isinstance(item, Gtk.Scale):
+            item.set_range(0, 255)
 
         return item
 
