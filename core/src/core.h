@@ -68,6 +68,15 @@ void auto_random_led_rgb(const CRGB& rgb)
 #endif
 }
 
+void auto_fadeToBlackBy(uint8_t fadeBy)
+{
+    fadeToBlackBy(DIGITAL_LEDS, DIGITAL_LED_COUNT, fadeBy);
+
+#ifdef ANALOG_LEDS_ENABLED
+    fadeToBlackBy(ANALOG_LEDS, ANALOG_LED_COUNT, fadeBy * 2);
+#endif
+}
+
 void auto_show()
 {
     FastLED.show();

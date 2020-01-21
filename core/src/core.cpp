@@ -158,7 +158,7 @@ void loop()
                 auto_fill_solid(color);
                 break;
             case 51: // solid color rotating
-                fadeToBlackBy(DIGITAL_LEDS, DIGITAL_LED_COUNT, 20);
+                auto_fadeToBlackBy(20);
                 wave = beatsin16(30, 0, DIGITAL_LED_COUNT-1);
                 DIGITAL_LEDS[wave] = color;
                 break;
@@ -181,7 +181,7 @@ void loop()
             case 103: // two colors up-down oposite
                 EVERY_N_MILLISECONDS(10)
                 {
-                    fadeToBlackBy(DIGITAL_LEDS, DIGITAL_LED_COUNT, 60);
+                    auto_fadeToBlackBy(60);
                     wave = beatsin16(15, 0, DIGITAL_LED_COUNT-1);
                     DIGITAL_LEDS[wave] = color;
                     DIGITAL_LEDS[map(wave, 0, DIGITAL_LED_COUNT-1, DIGITAL_LED_COUNT-1, 0)] = secondary_color;
@@ -190,7 +190,7 @@ void loop()
             case 104: // two colors random
                 EVERY_N_MILLISECONDS(20)
                 {
-                    fadeToBlackBy(DIGITAL_LEDS, DIGITAL_LED_COUNT, 15);
+                    auto_fadeToBlackBy(15);
 
                     if(random8() < 20)
                     {
