@@ -143,7 +143,7 @@ void loop()
                     auto_fill_solid(CRGB::Black);
                 continue;
             case 1: // fade
-                wave = beatsin16(10, 0, 255)
+                wave = beatsin16(10, 0, 255);
                 FastLED.setBrightness(wave);
                 continue;
             case 2: // pulse
