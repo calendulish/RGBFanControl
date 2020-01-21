@@ -163,20 +163,14 @@ void loop()
                 DIGITAL_LEDS[wave] = color;
                 break;
             case 100: // two colors
-                auto_fill_gradient_RGB(color, secondary_color);
+                auto_fill_gradient_RGB(0, color, secondary_color);
                 break;
             case 101: // two colors gradient
                 wave_rgb = blend(color, secondary_color, beatsin8(10));
                 auto_fill_solid(wave_rgb);
                 break;
             case 102: // two colors up-down
-                wave = beatsin8(20, 0, DIGITAL_LED_COUNT - 2);
-                fill_gradient_RGB(DIGITAL_LEDS + wave, DIGITAL_LED_COUNT - wave, color, secondary_color);
-
-#ifdef ANALOG_LEDS_ENABLED
-                wave = beatsin8(20, 0, ANALOG_LED_COUNT - 2);
-                fill_gradient_RGB(ANALOG_LEDS + wave, ANALOG_LED_COUNT - wave, color, secondary_color);
-#endif
+                auto_fill_gradient_RGB(20, color, secondary_color);
                 break;
             case 103: // two colors up-down oposite
                 EVERY_N_MILLISECONDS(10)

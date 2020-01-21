@@ -41,12 +41,21 @@ void auto_fill_rainbow(uint8_t initialhue, uint8_t deltahue = 5)
 #endif
 }
 
-void auto_fill_gradient_RGB(const CRGB &c1, const CRGB &c2)
+void auto_fill_gradient_RGB(uint8_t bpm, const CRGB &c1, const CRGB &c2)
 {
-    fill_gradient_RGB(DIGITAL_LEDS, DIGITAL_LED_COUNT, c1, c2);
+    uint8_t digital_wave = 0;
+    uint8_t analog_wave = 0;
+
+    if(bpm != 0)
+    {
+        digital_wave = beatsin16(bpm, 0, DIGITAL_LED_COUNT -1);
+        analog_wave = beatsin16(bpm, 0, ANALOG_LED_COUNT -1);
+    }
+
+    fill_gradient_RGB(DIGITAL_LEDS + digital_wave, DIGITAL_LED_COUNT - digital_wave, c1, c2);
 
 #ifdef ANALOG_LEDS_ENABLED
-    fill_gradient_RGB(ANALOG_LEDS, ANALOG_LED_COUNT, c1, c2);
+    fill_gradient_RGB(ANALOG_LEDS + analog_wave, ANALOG_LED_COUNT - analog_wave, c1, c2);
 #endif
 }
 
