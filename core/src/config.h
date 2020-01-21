@@ -21,6 +21,8 @@
 static const uint8_t DIGITAL_LED_COUNT = 30;
 static const uint8_t DIGITAL_DATA_PIN = 8;
 CRGB DIGITAL_LEDS[DIGITAL_LED_COUNT] = {};
+uint8_t DIGITAL_CUSTOM_LED_COUNT;
+CRGB DIGITAL_CUSTOM_COLOR;
 
 static const uint8_t ANALOG_LED_COUNT = 3;
 
@@ -32,6 +34,8 @@ static const uint8_t ANALOG_RGB_PIN[3] = {10, 11, 9};
 RwReg ANALOG_RGB_MASK[3];
 volatile RwReg *ANALOG_RGB_PORT[3];
 CRGB ANALOG_LEDS[ANALOG_LED_COUNT] = {};
+uint8_t ANALOG_CUSTOM_LED_COUNT;
+CRGB ANALOG_CUSTOM_COLOR;
 #endif
 
 static const uint8_t AUTOEFFECT_LED_COUNT = 1;

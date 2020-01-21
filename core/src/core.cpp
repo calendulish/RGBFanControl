@@ -245,6 +245,51 @@ void loop()
                     }
                 }
                 break;
+            case 502: // 3 colors cycle
+                EVERY_N_MILLISECONDS(40)
+                {
+                    fadeToBlackBy(DIGITAL_LEDS, DIGITAL_LED_COUNT, 60);
+
+                    DIGITAL_CUSTOM_LED_COUNT++;
+
+                    if(DIGITAL_CUSTOM_LED_COUNT == DIGITAL_LED_COUNT)
+                    {
+                        DIGITAL_CUSTOM_LED_COUNT = 0;
+
+                        if(DIGITAL_CUSTOM_COLOR == CRGB(CRGB::Red))
+                            DIGITAL_CUSTOM_COLOR = CRGB::Green;
+                        else if(DIGITAL_CUSTOM_COLOR == CRGB(CRGB::Green))
+                            DIGITAL_CUSTOM_COLOR = CRGB::Blue;
+                        else
+                            DIGITAL_CUSTOM_COLOR = CRGB::Red;
+                    }
+
+                    DIGITAL_LEDS[DIGITAL_CUSTOM_LED_COUNT] = DIGITAL_CUSTOM_COLOR;
+                }
+
+                EVERY_N_MILLISECONDS(250)
+                {
+#ifdef ANALOG_LEDS_ENABLED
+                    fadeToBlackBy(ANALOG_LEDS, ANALOG_LED_COUNT, 60*2);
+
+                    ANALOG_CUSTOM_LED_COUNT++;
+
+                    if(ANALOG_CUSTOM_LED_COUNT == ANALOG_LED_COUNT)
+                    {
+                        ANALOG_CUSTOM_LED_COUNT = 0;
+
+                        if(ANALOG_CUSTOM_COLOR == CRGB(CRGB::Red))
+                            ANALOG_CUSTOM_COLOR = CRGB::Green;
+                        else if(ANALOG_CUSTOM_COLOR == CRGB(CRGB::Green))
+                            ANALOG_CUSTOM_COLOR = CRGB::Blue;
+                        else
+                            ANALOG_CUSTOM_COLOR = CRGB::Red;
+                    }
+
+                    ANALOG_LEDS[ANALOG_CUSTOM_LED_COUNT] = ANALOG_CUSTOM_COLOR;
+#endif
+                }
+                break;
             default:
                 continue;
         }
