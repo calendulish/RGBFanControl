@@ -141,10 +141,11 @@ void loop()
                    config.effect_id[1] == 0 &&
                    config.effect_id[2] == 0)
                     auto_fill_solid(CRGB::Black);
-                break;
+                continue;
             case 1: // fade
-                FastLED.setBrightness(beatsin8(10));
-                break;
+                wave = beatsin16(10, 0, 255)
+                FastLED.setBrightness(wave);
+                continue;
             case 2: // pulse
                 EVERY_N_MILLISECONDS(400)
                 {
@@ -152,7 +153,7 @@ void loop()
                     auto_show();
                     FastLED.delay(200);
                 }
-                break;
+                continue;
             case 50: // solid color
                 auto_fill_solid(color);
                 break;
