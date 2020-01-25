@@ -18,8 +18,15 @@
 // comment to disable analog leds support
 #define ANALOG_LEDS_ENABLED
 
-static const uint8_t DIGITAL_LED_COUNT = 30;
-static const uint8_t DIGITAL_DATA_PIN = 8;
+static const uint8_t STRIP1_LED_COUNT = 15;
+static const uint8_t STRIP2_LED_COUNT = 15;
+static const uint8_t BACK_FAN_LED_COUNT = 27;
+
+static const uint8_t DIGITAL_LED_COUNT =
+    STRIP1_LED_COUNT +
+    STRIP2_LED_COUNT +
+    BACK_FAN_LED_COUNT;
+
 CRGB DIGITAL_LEDS[DIGITAL_LED_COUNT] = {};
 uint8_t DIGITAL_CUSTOM_LED_COUNT;
 CRGB DIGITAL_CUSTOM_COLOR;
