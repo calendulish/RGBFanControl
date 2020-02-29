@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
+from time import sleep
 
 import gi
 
@@ -23,6 +24,20 @@ from gi.repository import Gtk, Gio
 from collections import OrderedDict
 import utils
 import config
+
+auto_effect_dict = OrderedDict([
+    ("00", "Disabled"),
+    ("01", "Color Cycle"),
+    ("10", "Color Pulse"),
+    ("02", "Color Cycle Pulse"),
+    ("03", "Red"),
+    ("04", "Green"),
+    ("05", "Blue"),
+    ("06", "Purple"),
+    ("07", "Cyan"),
+    ("08", "Yellow"),
+    ("09", "White"),
+])
 
 primary_effects_dict = OrderedDict([
     ("000", "Disabled"),
@@ -93,8 +108,22 @@ class Main(Gtk.ApplicationWindow):
         main_grid.set_column_homogeneous(True)
         self.add(main_grid)
 
+        auto_effect_section = utils.Section("auto_effect", "Auto Effect")
+        main_grid.attach(auto_effect_section, 1, 0, 1, 1)
+
+        self.auto_effect = auto_effect_section.new(
+            "effect",
+            "Effect",
+            Gtk.ComboBoxText,
+            0, 0,
+            items=auto_effect_dict
+        )
+
+        self.auto_effect.connect("changed", self.on_auto_effect_changed)
+        self.auto_effect.load()
+
         effects_section = utils.Section("effects", "Effects")
-        main_grid.attach(effects_section, 0, 0, 1, 1)
+        main_grid.attach(effects_section, 0, 0, 1, 2)
 
         self.primary_color = effects_section.new("primary_color", "Primary Color", Gtk.ColorButton, 0, 3)
         self.primary_color.connect("notify::color", self.on_color_changed)
@@ -136,7 +165,7 @@ class Main(Gtk.ApplicationWindow):
         self.extra_effect.load()
 
         advanced_section = utils.Section("advanced", "Advanced")
-        main_grid.attach(advanced_section, 1, 0, 1, 1)
+        main_grid.attach(advanced_section, 1, 1, 1, 1)
 
         speed = advanced_section.new("speed", "Speed", Gtk.Scale, 0, 0)
         speed.connect('change-value', self.on_scale_changed)
@@ -148,11 +177,11 @@ class Main(Gtk.ApplicationWindow):
 
         reset = Gtk.Button("Reset Arduino")
         reset.connect('clicked', self.on_reset_clicked)
-        main_grid.attach(reset, 0, 1, 1, 1)
+        main_grid.attach(reset, 0, 2, 1, 1)
 
         save = Gtk.Button("EEPROM Save")
         save.connect('clicked', self.on_save_clicked)
-        main_grid.attach(save, 0, 2, 1, 1)
+        main_grid.attach(save, 1, 2, 1, 1)
 
         self.connect("destroy", self.application.on_exit_activate, None)
         self.show_all()
@@ -171,6 +200,17 @@ class Main(Gtk.ApplicationWindow):
 
         serial_message = 'l{}{:0=3d}'.format(name[0:1], int(value))
         self.application.send_serial(serial_message)
+
+    def on_auto_effect_changed(self, combo: Gtk.ComboBoxText) -> None:
+        name = combo.get_name()
+        effect = list(auto_effect_dict)[combo.get_active()]
+
+        config.new('auto_effect', name, effect)
+
+        serial_message = 'la'
+        serial_message += config.parser.get("auto_effect", name)
+        self.application.send_serial(serial_message)
+        sleep(3)
 
     def on_effects_changed(self, combo: Gtk.ComboBoxText) -> None:
         self.primary_effect.set_sensitive(True)

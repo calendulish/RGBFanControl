@@ -39,6 +39,9 @@ def init() -> None:
                 'led_colors': '000000000' * 29,
                 'effect': '0',
             },
+            'auto_effect': {
+                'effect': '00',
+            },
             'effects': {
                 'primary_effect': '050',
                 'secondary_effect': '000',

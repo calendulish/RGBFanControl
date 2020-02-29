@@ -36,7 +36,7 @@ class RGBFanControl(Gtk.Application):
         self._serial = serial.Serial()
         self._serial.setDTR(False)
         self._serial.baudrate = 19200
-        self._serial.port = 'COM9'
+        self._serial.port = 'COM3'
 
     @property
     def main_window(self) -> Gtk.ApplicationWindow:
