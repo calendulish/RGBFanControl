@@ -210,7 +210,7 @@ class Main(Gtk.ApplicationWindow):
         serial_message = 'la'
         serial_message += config.parser.get("auto_effect", name)
         self.application.send_serial(serial_message)
-        sleep(3)
+        sleep(1.5)
 
     def on_effects_changed(self, combo: Gtk.ComboBoxText) -> None:
         self.primary_effect.set_sensitive(True)

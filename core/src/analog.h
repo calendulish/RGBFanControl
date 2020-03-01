@@ -84,6 +84,6 @@ void analog_pulse(uint8_t led, uint16_t delay_, uint8_t count)
         auto_hi(led);
         delay(delay_);
         auto_lo(led);
-        delay(50);
+        delay(15);
     }
 }

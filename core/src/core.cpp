@@ -120,7 +120,7 @@ void loop()
     {
         for (uint8_t led = 0; led < AUTOEFFECT_LED_COUNT; led++)
         {
-            analog_pulse(led, 2000, 1);
+            analog_pulse(led, 1600, 1);
             analog_pulse(led, 50, config.auto_effect_id);
         }
 
