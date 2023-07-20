@@ -198,7 +198,7 @@ class Main(Gtk.ApplicationWindow):
 
         config.new("advanced", name, value)
 
-        serial_message = 'l{}{:0=3d}'.format(name[0:1], int(value))
+        serial_message = 'l{}{:0=3d}'.format(name[:1], int(value))
         self.application.send_serial(serial_message)
 
     def on_auto_effect_changed(self, combo: Gtk.ComboBoxText) -> None:
@@ -261,11 +261,7 @@ class Main(Gtk.ApplicationWindow):
         color_string = utils.rgba_to_led_color(color_button.get_rgba())
         config.new("effects", name, color_string)
 
-        if name == "primary_color":
-            serial_message = "lc"
-        else:
-            serial_message = "ls"
-
+        serial_message = "lc" if name == "primary_color" else "ls"
         serial_message += color_string
         self.application.send_serial(serial_message)
 
