@@ -28,7 +28,12 @@ log = logging.getLogger(__name__)
 
 
 def led_color_to_rgba(led_color: str) -> Gdk.RGBA:
-    return Gdk.RGBA(*[int(led_color[c * 3:3 + c * 3]) / 255.0 for c in range(int(len(led_color) / 3))])
+    return Gdk.RGBA(
+        *[
+            int(led_color[c * 3 : 3 + c * 3]) / 255.0
+            for c in range(len(led_color) // 3)
+        ]
+    )
 
 
 def rgba_to_led_color(rgba: Gdk.RGBA) -> str:
@@ -52,6 +57,8 @@ class Section(Gtk.Frame):
     def __item_factory(self, children: Callable[..., Gtk.Widget]) -> Any:
         # FIXME: https://github.com/python/mypy/issues/2477
         children_ = children  # type: Any
+
+
 
         class Item(children_):
             def __init__(self, name: str, section_name: str, label: str, items: Optional[OrderedDict]) -> None:
@@ -92,10 +99,7 @@ class Section(Gtk.Frame):
                     try:
                         current_option = list(self._items).index(value)
                     except ValueError:
-                        error_message = "Please, fix your config file. Accepted values for {} are:\n{}".format(
-                            self._name,
-                            ', '.join(self._items.keys()),
-                        )
+                        error_message = f"Please, fix your config file. Accepted values for {self._name} are:\n{', '.join(self._items.keys())}"
                         log.exception(error_message)
                         fatal_error_dialog(error_message)
                         # unset active self
@@ -114,6 +118,7 @@ class Section(Gtk.Frame):
                 if isinstance(self, Gtk.ColorButton):
                     value = config.parser.get(self._section_name, self._name)
                     self.set_rgba(led_color_to_rgba(value))
+
 
         return Item
 
@@ -145,9 +150,7 @@ class Section(Gtk.Frame):
                 item.append_text(value_)
 
         if isinstance(item, Gtk.Entry):
-            value = config.parser.get(section, option)
-
-            if value:
+            if value := config.parser.get(section, option):
                 item.set_text(value)
 
         if isinstance(item, Gtk.Scale):
@@ -215,12 +218,11 @@ class BFanSettings(Gtk.Frame):
         dialog.destroy()
 
     def on_led_color_changed(self, color_selection: Gtk.ColorSelection) -> None:
-        serial_message = 'bc'
         color_raw = color_selection.get_current_rgba().to_string()
         color_string = ['{0:0=3d}'.format(int(color)) for color in color_raw[4:-1].split(',')]
         config.new("back", "led_colors", ''.join(color_string) * 29)
 
-        serial_message += ''.join(config.parser.get("back", "led_colors"))
+        serial_message = 'bc' + ''.join(config.parser.get("back", "led_colors"))
         self.application.send_serial(serial_message)
 
     def on_effect_changed(self, radio_button: Gtk.RadioButton, effect: int) -> None:
@@ -365,7 +367,7 @@ class FFanSettings(Gtk.Frame):
     def on_delay_change(self, scale: Gtk.Scale, type_: str, value: str) -> None:
         serial_message = 'fd'
         pulse = int(value)
-        if pulse < 0: pulse = 0
+        pulse = max(pulse, 0)
 
         if self.fan_index == -1:
             config.new("front", "delay", '{0:0=3d}'.format(pulse) * 3)
@@ -378,7 +380,7 @@ class FFanSettings(Gtk.Frame):
     def on_divisor_change(self, scale: Gtk.Scale, type_: str, value: str) -> None:
         serial_message = 'fi'
         pulse = int(value)
-        if pulse < 1: pulse = 1
+        pulse = max(pulse, 1)
 
         if self.fan_index == -1:
             config.new("front", "divisor", '{0:0=3d}'.format(pulse) * 3)
@@ -391,7 +393,7 @@ class FFanSettings(Gtk.Frame):
     def on_multiplier_change(self, scale: Gtk.Scale, type_: str, value: str) -> None:
         serial_message = 'fm'
         pulse = int(value)
-        if pulse < 1: pulse = 1
+        pulse = max(pulse, 1)
 
         if self.fan_index == -1:
             config.new("front", "multiplier", '{0:0=3d}'.format(pulse) * 3)

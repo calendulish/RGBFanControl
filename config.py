@@ -78,8 +78,10 @@ def get_from_index(section: str, option: str, index: int, size: int = 1) -> str:
 def set_to_index(section: str, option: str, value: str, index: int) -> None:
     old_value = parser.get(section, option)
     value_size = len(value)
-    temp_value = [old_value[k * value_size:value_size + k * value_size] for k in
-                  range(int(len(old_value) / value_size))]
+    temp_value = [
+        old_value[k * value_size : value_size + k * value_size]
+        for k in range(len(old_value) // value_size)
+    ]
     temp_value[index] = value
 
     new(section, option, ''.join(temp_value))
